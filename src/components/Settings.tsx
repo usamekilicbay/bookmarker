@@ -22,37 +22,41 @@ import { STORAGE_KEY } from "../common/constants";
 export default function Settings(props: {
   deleteAllSavedPages: () => void;
   loadSavedPages: (storageKey: string) => void;
+  importPages:(file: File) => void;
   getSavedPage: (id: string) => SavedPageModel | undefined;
   savedPages: SavedPageModel[];
 }) {
-  const toast = useToast();
+  const toast = useToast(); 
 
   const handleExportData = () => {
     const jsonData = JSON.stringify(props.savedPages, null, 2);
     const blob = new Blob([jsonData], { type: "application/json" });
-    // TODO: update file name for saving
-    saveAs(blob, "bookmark-saved-pages.json");
+    saveAs(blob, "bookmarker-saved-pages.json");
 
     toast({
-      title: "Data exportded successfully",
+      title: "Data exported successfully",
+      description: "You can download it now",
       status: "success",
       duration: 2000,
       isClosable: true,
     });
   };
 
-  // TODO: update the method
   const handleImportData = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event);
-    console.log("import data");
-    //      const file = event.target.files[0];
-    //      // Check for valid JSON file
-    //      if (file && file.type === "application/json") {
-    //        readFileContent(file);
-    //      } else {
-    //        // Handle invalid file type
-    //      }
-    //    };
+    const target = event.target as HTMLInputElement & {files: FileList};
+    const file = target.files[0];
+    console.log(file);
+         if (file && file.type === "application/json") {
+          props.importPages(file);
+         } else {
+          toast({
+            title: "Data import failed",
+            description: "Imported file is in wrong format",
+            status: "error",
+            duration: 2000,
+            isClosable: true,
+          });
+         }
 
     toast({
       title: "Data imported successfully",
@@ -64,13 +68,6 @@ export default function Settings(props: {
 
   const onLoadSavedPages = () => {
     props.loadSavedPages(STORAGE_KEY);
-
-    toast({
-      title: "Pages loaded successfully",
-      status: "success",
-      duration: 2000,
-      isClosable: true,
-    });
   };
 
   return (

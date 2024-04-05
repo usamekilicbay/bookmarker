@@ -104,6 +104,7 @@ export default function App() {
     }
   }
 
+  // TODO: does not work properly
   function deletePage(pageId: string) {
     let tempPages: SavedPageModel[] = [...pageList];
     tempPages = tempPages.filter((p) => p.id !== pageId);
@@ -129,6 +130,27 @@ export default function App() {
     });
   };
 
+  function importPages(file: File): void {
+    const reader = new FileReader();
+    reader.readAsText(file);
+
+    reader.onload = (e) => {
+      try {
+        const pages: SavedPageModel[] = JSON.parse(e.target?.result as string) as SavedPageModel[];
+        if(pages){
+          setPageList(pages);
+        }
+      } catch (error) {
+        toast({
+          title: "Import failed",
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
+      }
+    };
+  }
+
   return (
     <>
       <Box>
@@ -136,8 +158,9 @@ export default function App() {
           <Links></Links>
           <Settings
             deleteAllSavedPages={deleteAllSavedPages}
-            getSavedPage={() => getSavedPage(crypto.randomUUID())}
             loadSavedPages={() => loadSavedPages(STORAGE_KEY)}
+            importPages={importPages}
+            getSavedPage={() => getSavedPage(crypto.randomUUID())}
             savedPages={pageList}
           ></Settings>
         </Flex>
