@@ -8,7 +8,7 @@ import { Box, Flex, List, useToast } from "@chakra-ui/react";
 import Settings from "./components/Settings";
 import { STORAGE_KEY } from "./common/constants";
 
-const isDummyDataActive = true;
+const isDummyDataActive = false;
 
 export default function App() {
   const [page, setPage] = useState<SavedPageModel>();
@@ -67,17 +67,16 @@ export default function App() {
         return pages;
       }
       toast({
-        title: "Pages could not be retrieved",
-        description: "There are no saved pages!",
+        title: "Format error!",
+        description: "Pages could not be retrieved",
         status: "error",
         duration: 2000,
         isClosable: true,
       });
     }
     toast({
-      title: "Pages could not be retrieved",
-      description: "There are no saved pages!",
-      status: "error",
+      title: "There are no saved pages yet",
+      status: "info",
       duration: 2000,
       isClosable: true,
     });
