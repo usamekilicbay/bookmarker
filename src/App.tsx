@@ -12,42 +12,44 @@ const isDummyDataActive = false;
 
 export default function App() {
   const [page, setPage] = useState<SavedPageModel>();
-  const [pageList, setPageList] = useState<SavedPageModel[]>([]);
+  const [pages, setPages] = useState<SavedPageModel[]>([]);
+  const [isDelete, setIsDelete] = useState<boolean>(false);
   const toast = useToast();
 
   useEffect(() => {
     savePages();
-  }, [pageList]);
+  }, [pages]);
 
   useEffect(() => {
-    if (pageList.length == 0) {
+    if (pages.length === 0) {
       const tempPages: SavedPageModel[] | undefined =
         loadSavedPages(STORAGE_KEY);
       if (tempPages) {
-        setPageList(tempPages);
+        setPages(tempPages);
       }
     }
     addPageToPagesList(page);
   }, [page]);
 
-  const savePages = () => {
-    if (pageList.length > 0) {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(pageList));
+  function savePages(): void {
+    if (isDelete || pages.length > 0){
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(pages));
+      setIsDelete(false)
     }
   };
 
   function addPageToPagesList(page: SavedPageModel | undefined) {
     if (page && page.id && page.url && page.title && page.reminderText) {
-      const existingPageIndex = pageList.findIndex((p) => p.id === page.id);
+      const existingPageIndex = pages.findIndex((p) => p.id === page.id);
       const updatedPages =
         existingPageIndex !== -1
           ? [
-              ...pageList.slice(0, existingPageIndex),
+              ...pages.slice(0, existingPageIndex),
               page,
-              ...pageList.slice(existingPageIndex + 1),
+              ...pages.slice(existingPageIndex + 1),
             ]
-          : [...pageList, page];
-      setPageList(updatedPages);
+          : [...pages, page];
+      setPages(updatedPages);
 
       toast({
         title: "New page added",
@@ -62,9 +64,9 @@ export default function App() {
   function loadSavedPages(storageKey: string): SavedPageModel[] | undefined {
     const value = window.localStorage.getItem(storageKey);
     if (value) {
-      const pages: SavedPageModel[] = JSON.parse(value) as SavedPageModel[];
-      if (pages) {
-        return pages;
+      const tempPages: SavedPageModel[] = JSON.parse(value) as SavedPageModel[];
+      if (tempPages) {
+        return tempPages;
       }
       toast({
         title: "Format error!",
@@ -97,18 +99,18 @@ export default function App() {
   }
 
   function editPage(pageId: string, reminderText: string) {
-    let page = pageList.find((page) => page.id === pageId);
+    let page = pages.find((page) => page.id === pageId);
     if (page && reminderText) {
       page.reminderText = reminderText;
       setPage(page);
     }
   }
 
-  // TODO: does not work properly
-  function deletePage(pageId: string) {
-    let tempPages: SavedPageModel[] = [...pageList];
-    tempPages = tempPages.filter((p) => p.id !== pageId);
-    setPageList(tempPages);
+  function deletePage(id: string) {
+  setIsDelete(true);
+    let tempPages: SavedPageModel[] = [...pages];
+    tempPages = tempPages.filter((p) => p.id !== id);
+    setPages(tempPages);
 
     toast({
       title: "Page deleted successfully",
@@ -119,8 +121,8 @@ export default function App() {
   }
 
   const deleteAllSavedPages = () => {
-    window.localStorage.removeItem(STORAGE_KEY);
-    setPageList([]);
+    setIsDelete(true);
+    setPages([]);
 
     toast({
       title: "All pages are deleted successfully",
@@ -136,9 +138,9 @@ export default function App() {
 
     reader.onload = (e) => {
       try {
-        const pages: SavedPageModel[] = JSON.parse(e.target?.result as string) as SavedPageModel[];
-        if(pages){
-          setPageList(pages);
+        const tempPages: SavedPageModel[] = JSON.parse(e.target?.result as string) as SavedPageModel[];
+        if(tempPages){
+          setPages(tempPages);
         }
       } catch (error) {
         toast({
@@ -161,7 +163,7 @@ export default function App() {
             loadSavedPages={() => loadSavedPages(STORAGE_KEY)}
             importPages={importPages}
             getSavedPage={() => getSavedPage(crypto.randomUUID())}
-            savedPages={pageList}
+            savedPages={pages}
           ></Settings>
         </Flex>
         <Box w="400px">
@@ -197,7 +199,7 @@ export default function App() {
             }}
           >
             {isDummyDataActive && dummyData()}
-            {pageList
+            {pages
               .slice()
               .reverse()
               .map((page) => (
