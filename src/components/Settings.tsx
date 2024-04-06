@@ -81,13 +81,9 @@ export default function Settings(props: {
     saveAs(blob, "bookmarker-saved-pages.json");
     toast({
       title: "Data exported successfully",
-
       description: "You can download it now",
-
       status: "success",
-
       duration: 2000,
-
       isClosable: true,
     });
   };
