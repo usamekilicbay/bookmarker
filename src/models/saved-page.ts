@@ -1,4 +1,4 @@
-export interface SavedPageModel {
+export interface ISavedPage {
   id: string;
   url: string;
   title: string;

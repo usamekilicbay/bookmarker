@@ -1,4 +1,4 @@
-import { SavedPageModel } from "../models/saved-page";
+import { ISavedPage } from "../models/saved-page";
 import {
   HiChevronDown,
   HiChevronUp,
@@ -31,9 +31,10 @@ import {
 } from "@chakra-ui/react";
 
 export default function SavedPage(props: {
-  incomingPage: SavedPageModel;
+  incomingPage: ISavedPage;
   deletePage: () => void;
   editPage: (editedReminderText: string) => void;
+  isAutoDelete: boolean;
 }) {
   const [editModeToggle, setEditModeToggle] = useBoolean(false);
   const [showDetails, setShowDetails] = useBoolean(false);
@@ -49,11 +50,11 @@ export default function SavedPage(props: {
     minute: "2-digit",
   });
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     props.incomingPage.reminderText = e.target.value;
   };
 
-  const onFinishEditing = () => {
+  const handleOnFinishEditing = () => {
     setEditModeToggle.off;
     props.editPage(props.incomingPage.reminderText);
 
@@ -63,6 +64,12 @@ export default function SavedPage(props: {
       duration: 2000,
       isClosable: true,
     });
+  };
+
+  const handleLinkOnClick = () => {
+    if (props.isAutoDelete) {
+      props.deletePage();
+    }
   };
 
   return (
@@ -89,7 +96,7 @@ export default function SavedPage(props: {
                   padding={3}
                 >
                   <EditablePreview />
-                  <EditableTextarea onChange={() => onChange} />
+                  <EditableTextarea onChange={() => handleOnChange} />
                 </Editable>
                 <Divider
                   h="5em"
@@ -107,7 +114,11 @@ export default function SavedPage(props: {
                   textAlign="start"
                   textColor="black.alpha.50"
                 >
-                  <Link href={props.incomingPage.url} isExternal>
+                  <Link
+                    onClick={handleLinkOnClick}
+                    href={props.incomingPage.url}
+                    isExternal
+                  >
                     {props.incomingPage.reminderText}
                   </Link>
                 </Box>
@@ -127,7 +138,7 @@ export default function SavedPage(props: {
                       variant="ghost"
                       size="sm"
                       icon={<HiOutlineCheck></HiOutlineCheck>}
-                      onClick={() => onFinishEditing()}
+                      onClick={() => handleOnFinishEditing()}
                     />
                   </Tooltip>
                 ) : (

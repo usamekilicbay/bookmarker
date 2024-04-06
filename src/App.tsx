@@ -2,18 +2,19 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import SavedPage from "./components/SavedPage";
 import SavePageTextBox from "./components/SavePageTextBox";
-import { SavedPageModel } from "./models/saved-page";
+import { ISavedPage } from "./models/saved-page";
 import Links from "./components/Links";
 import { Box, Flex, List, useToast } from "@chakra-ui/react";
 import Settings from "./components/Settings";
-import { STORAGE_KEY } from "./common/constants";
+import { PAGE_SAVE_STORAGE_KEY } from "./common/constants";
 
 const isDummyDataActive = false;
 
 export default function App() {
-  const [page, setPage] = useState<SavedPageModel>();
-  const [pages, setPages] = useState<SavedPageModel[]>([]);
+  const [page, setPage] = useState<ISavedPage>();
+  const [pages, setPages] = useState<ISavedPage[]>([]);
   const [isDelete, setIsDelete] = useState<boolean>(false);
+  const [isAutoDelete, setIsAutoDelete] = useState<boolean>(false);
   const toast = useToast();
 
   useEffect(() => {
@@ -22,8 +23,9 @@ export default function App() {
 
   useEffect(() => {
     if (pages.length === 0) {
-      const tempPages: SavedPageModel[] | undefined =
-        loadSavedPages(STORAGE_KEY);
+      const tempPages: ISavedPage[] | undefined = loadSavedPages(
+        PAGE_SAVE_STORAGE_KEY
+      );
       if (tempPages) {
         setPages(tempPages);
       }
@@ -32,13 +34,13 @@ export default function App() {
   }, [page]);
 
   function savePages(): void {
-    if (isDelete || pages.length > 0){
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(pages));
-      setIsDelete(false)
+    if (isDelete || pages.length > 0) {
+      window.localStorage.setItem(PAGE_SAVE_STORAGE_KEY, JSON.stringify(pages));
+      setIsDelete(false);
     }
-  };
+  }
 
-  function addPageToPagesList(page: SavedPageModel | undefined) {
+  function addPageToPagesList(page: ISavedPage | undefined) {
     if (page && page.id && page.url && page.title && page.reminderText) {
       const existingPageIndex = pages.findIndex((p) => p.id === page.id);
       const updatedPages =
@@ -61,10 +63,10 @@ export default function App() {
     }
   }
 
-  function loadSavedPages(storageKey: string): SavedPageModel[] | undefined {
+  function loadSavedPages(storageKey: string): ISavedPage[] | undefined {
     const value = window.localStorage.getItem(storageKey);
     if (value) {
-      const tempPages: SavedPageModel[] = JSON.parse(value) as SavedPageModel[];
+      const tempPages: ISavedPage[] = JSON.parse(value) as ISavedPage[];
       if (tempPages) {
         return tempPages;
       }
@@ -84,8 +86,8 @@ export default function App() {
     });
   }
 
-  function getSavedPage(id: string): SavedPageModel | undefined {
-    const pages = loadSavedPages(STORAGE_KEY);
+  function getSavedPage(id: string): ISavedPage | undefined {
+    const pages = loadSavedPages(PAGE_SAVE_STORAGE_KEY);
     if (pages) {
       return pages.find((page) => page.id === id);
     }
@@ -107,8 +109,8 @@ export default function App() {
   }
 
   function deletePage(id: string) {
-  setIsDelete(true);
-    let tempPages: SavedPageModel[] = [...pages];
+    setIsDelete(true);
+    let tempPages: ISavedPage[] = [...pages];
     tempPages = tempPages.filter((p) => p.id !== id);
     setPages(tempPages);
 
@@ -138,8 +140,10 @@ export default function App() {
 
     reader.onload = (e) => {
       try {
-        const tempPages: SavedPageModel[] = JSON.parse(e.target?.result as string) as SavedPageModel[];
-        if(tempPages){
+        const tempPages: ISavedPage[] = JSON.parse(
+          e.target?.result as string
+        ) as ISavedPage[];
+        if (tempPages) {
           setPages(tempPages);
         }
       } catch (error) {
@@ -160,10 +164,11 @@ export default function App() {
           <Links></Links>
           <Settings
             deleteAllSavedPages={deleteAllSavedPages}
-            loadSavedPages={() => loadSavedPages(STORAGE_KEY)}
+            loadSavedPages={() => loadSavedPages(PAGE_SAVE_STORAGE_KEY)}
             importPages={importPages}
             getSavedPage={() => getSavedPage(crypto.randomUUID())}
             savedPages={pages}
+            setIsAutoDelete={setIsAutoDelete}
           ></Settings>
         </Flex>
         <Box w="400px">
@@ -216,6 +221,7 @@ export default function App() {
                   editPage={(editedReminderText: string) =>
                     editPage(page.id, editedReminderText)
                   }
+                  isAutoDelete={isAutoDelete}
                 ></SavedPage>
               ))}
           </List>
@@ -246,6 +252,7 @@ export default function App() {
             editedReminderText
           )
         }
+        isAutoDelete={isAutoDelete}
       />
     ));
   }

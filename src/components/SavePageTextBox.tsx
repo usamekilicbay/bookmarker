@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { SavedPageModel } from "../models/saved-page";
+import { ISavedPage } from "../models/saved-page";
 import { Box, Flex, IconButton, Input, useToast } from "@chakra-ui/react";
 import { HiPlus } from "react-icons/hi";
 import { REMINDER_TEXT_MIN_LENGTH } from "../common/constants";
 
 export default function SavePageTextBox(props: {
-  setPage: (page: SavedPageModel) => void;
+  setPage: (page: ISavedPage) => void;
 }) {
   const [reminderText, setReminderText] = useState<string>();
   const [isValid, setIsValid] = useState<boolean>(false);
