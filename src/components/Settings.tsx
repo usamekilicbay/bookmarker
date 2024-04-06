@@ -52,13 +52,10 @@ export default function Settings(props: {
 
   function loadSettings(): ISettings {
     const value = window.localStorage.getItem(SETTINGS_STORAGE_KEY);
-
     if (value) {
       const tempSettings = JSON.parse(value) as ISettings;
-
       return tempSettings;
     }
-
     return {} as ISettings;
   }
 
@@ -67,12 +64,13 @@ export default function Settings(props: {
   }
 
   const handleOnChangeAutoDelete = (): void => {
+    const currentIsAutoDeleteChecked = !isAutoDeleteChecked;
     setSettings({
       ...settings,
-      autoDelete: !isAutoDeleteChecked,
+      autoDelete: currentIsAutoDeleteChecked,
     });
 
-    props.setIsAutoDelete(isAutoDeleteChecked);
+    props.setIsAutoDelete(currentIsAutoDeleteChecked);
   };
 
   const handleExportData = () => {
@@ -88,31 +86,31 @@ export default function Settings(props: {
     });
   };
 
-  const handleImportData = (event: React.ChangeEvent<HTMLInputElement>) => {
+  function handleImportData(event: React.ChangeEvent<HTMLInputElement>): void {
     const target = event.target as HTMLInputElement & { files: FileList };
     const file = target.files[0];
-
     if (file && file.type === "application/json") {
       props.importPages(file);
-    } else {
+
       toast({
-        title: "Data import failed",
-        description: "Imported file is in wrong format",
-        status: "error",
+        title: "Data imported successfully",
+        status: "success",
         duration: 2000,
         isClosable: true,
       });
-    }
 
+      return;
+    }
     toast({
-      title: "Data imported successfully",
-      status: "success",
+      title: "Data import failed",
+      description: "Imported file is in wrong format",
+      status: "error",
       duration: 2000,
       isClosable: true,
     });
-  };
+  }
 
-  const handleOnLoadSavedPages = () => {
+  const handleOnLoadSavedPages = (): void => {
     props.loadSavedPages(PAGE_SAVE_STORAGE_KEY);
   };
 
