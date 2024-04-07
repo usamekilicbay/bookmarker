@@ -10,25 +10,18 @@ import {
   Box,
   Divider,
   Editable,
+  EditableInput,
   EditablePreview,
-  EditableTextarea,
-  Flex,
+  HStack,
   IconButton,
   Link,
   ListItem,
-  // Popover,
-  // PopoverArrow,
-  // PopoverBody,
-  // PopoverCloseButton,
-  // PopoverContent,
-  // PopoverHeader,
-  // PopoverTrigger,
-  // Portal,
   Text,
   Tooltip,
   useBoolean,
   useToast,
 } from "@chakra-ui/react";
+import { useState } from "react";
 
 export default function SavedPage(props: {
   incomingPage: ISavedPage;
@@ -36,8 +29,8 @@ export default function SavedPage(props: {
   editPage: (editedReminderText: string) => void;
   isAutoDelete: boolean;
 }) {
-  const [editModeToggle, setEditModeToggle] = useBoolean(false);
-  const [showDetails, setShowDetails] = useBoolean(false);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isDetailsExpanded, setIsDetailsExpanded] = useBoolean(false);
   const toast = useToast();
 
   const dateObject = new Date(props.incomingPage.saveDate);
@@ -50,16 +43,18 @@ export default function SavedPage(props: {
     minute: "2-digit",
   });
 
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleOnChangeReminderText = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ): void => {
     props.incomingPage.reminderText = e.target.value;
+    console.log(props.incomingPage.reminderText);
   };
 
-  const handleOnFinishEditing = () => {
-    setEditModeToggle.off;
+  const handleOnFinishEditingReminderText = () => {
+    setIsEditing(false);
     props.editPage(props.incomingPage.reminderText);
-
     toast({
-      title: "Page edited successfully",
+      title: "Reminder text updated successfully",
       status: "success",
       duration: 2000,
       isClosable: true,
@@ -67,6 +62,7 @@ export default function SavedPage(props: {
   };
 
   const handleLinkOnClick = () => {
+    window.open(props.incomingPage.url, "_blank");
     if (props.isAutoDelete) {
       props.deletePage();
     }
@@ -80,143 +76,103 @@ export default function SavedPage(props: {
           bg="orange.50"
           outline="solid 1px"
           outlineColor="orange.500"
-          my={showDetails ? "10px" : undefined}
+          my={isDetailsExpanded ? "10px" : undefined}
           _hover={{
             transform: "scale(1.1)",
             bg: "orange.100",
           }}
           transition="transform 0.2s ease-in-out"
         >
-          <Flex align="center">
-            {editModeToggle ? (
-              <>
+          {isEditing ? (
+            <HStack spacing={1}>
+              <Box flexGrow={1}>
                 <Editable
                   defaultValue={props.incomingPage.reminderText}
                   textAlign="start"
-                  padding={3}
+                  p={1}
+                  pe={0}
+                  startWithEditView
+                  onSubmit={handleOnFinishEditingReminderText}
                 >
                   <EditablePreview />
-                  <EditableTextarea onChange={() => handleOnChange} />
+                  <EditableInput onChange={handleOnChangeReminderText} />
                 </Editable>
-                <Divider
-                  h="5em"
-                  orientation="vertical"
-                  borderColor="orange.500"
-                />
-              </>
-            ) : (
-              <>
+              </Box>
+              <Divider
+                h="2em"
+                orientation="vertical"
+                borderColor="orange.500"
+              />
+              <Box>
+                <Tooltip label="Save" hasArrow>
+                  <IconButton
+                    aria-label="Save changes"
+                    variant="ghost"
+                    icon={<HiOutlineCheck></HiOutlineCheck>}
+                    onClick={handleOnFinishEditingReminderText}
+                  />
+                </Tooltip>
+              </Box>
+            </HStack>
+          ) : (
+            <>
+              <HStack spacing={0}>
                 <Box
+                  as="a"
                   flexGrow={1}
-                  isTruncated
                   borderRadius="sm"
                   padding={1}
                   textAlign="start"
                   textColor="black.alpha.50"
+                  onClick={handleLinkOnClick}
                 >
-                  <Link
-                    onClick={handleLinkOnClick}
-                    href={props.incomingPage.url}
-                    isExternal
-                  >
-                    {props.incomingPage.reminderText}
-                  </Link>
+                  <Link isTruncated>{props.incomingPage.reminderText}</Link>
                 </Box>
                 <Divider
                   h="1em"
                   orientation="vertical"
                   borderColor="orange.500"
                 />
-              </>
-            )}
-            <Box ms={1}>
-              <Flex>
-                {editModeToggle ? (
-                  <Tooltip label="Save" hasArrow>
+                <Box ms={1}>
+                  <Tooltip label="Details" hasArrow>
                     <IconButton
-                      aria-label="Save changes"
+                      aria-label="Show details"
                       variant="ghost"
                       size="sm"
-                      icon={<HiOutlineCheck></HiOutlineCheck>}
-                      onClick={() => handleOnFinishEditing()}
+                      onClick={setIsDetailsExpanded.toggle}
+                      icon={
+                        isDetailsExpanded ? (
+                          <HiChevronUp></HiChevronUp>
+                        ) : (
+                          <HiChevronDown></HiChevronDown>
+                        )
+                      }
                     />
                   </Tooltip>
-                ) : (
-                  <>
-                    <Tooltip label="Details" hasArrow>
-                      <IconButton
-                        aria-label="Show details"
-                        variant="ghost"
-                        size="sm"
-                        onClick={setShowDetails.toggle}
-                        icon={
-                          showDetails ? (
-                            <HiChevronUp></HiChevronUp>
-                          ) : (
-                            <HiChevronDown></HiChevronDown>
-                          )
-                        }
-                      />
-                    </Tooltip>
-                    <Tooltip label="Edit" hasArrow>
-                      <IconButton
-                        aria-label="Edit saved page"
-                        variant="ghost"
-                        size="sm"
-                        icon={<HiOutlinePencilAlt></HiOutlinePencilAlt>}
-                        onClick={setEditModeToggle.on}
-                      />
-                    </Tooltip>
-                    {/* <Popover>
-                      <Tooltip label="Details" hasArrow>
-                        <Box>
-                          <PopoverTrigger>
-                            <IconButton
-                              aria-label="Show details"
-                              variant="ghost"
-                              size="sm"
-                              icon={
-                                <HiOutlineMagnifyingGlass></HiOutlineMagnifyingGlass>
-                              }
-                            />
-                          </PopoverTrigger>
-                        </Box>
-                      </Tooltip>
-                      <Portal>
-                        <PopoverContent w="200px">
-                          <PopoverArrow />
-                          <PopoverCloseButton />
-                          <PopoverHeader>
-                            <Text fontSize="xs">{formattedDate}</Text>
-                            <Text align="center">
-                              {props.incomingPage.title}
-                            </Text>
-                          </PopoverHeader>
-                          <PopoverBody>
-                            <Text align="start">
-                              {props.incomingPage.reminderText}
-                            </Text>
-                          </PopoverBody>
-                        </PopoverContent>
-                      </Portal>
-                    </Popover>
-                            */}
-                  </>
-                )}
-                <Tooltip label="Delete" hasArrow>
-                  <IconButton
-                    aria-label="Delete saved page"
-                    variant="ghost"
-                    size="sm"
-                    textColor="orangered"
-                    icon={<HiOutlineTrash></HiOutlineTrash>}
-                    onClick={props.deletePage}
-                  />
-                </Tooltip>
-              </Flex>
-            </Box>
-          </Flex>
-          {showDetails && (
+                  <Tooltip label="Edit" hasArrow>
+                    <IconButton
+                      aria-label="Edit saved page"
+                      variant="ghost"
+                      size="sm"
+                      icon={<HiOutlinePencilAlt></HiOutlinePencilAlt>}
+                      onClick={() => setIsEditing(true)}
+                    />
+                  </Tooltip>
+                  <Tooltip label="Delete" hasArrow>
+                    <IconButton
+                      aria-label="Delete saved page"
+                      variant="ghost"
+                      size="sm"
+                      textColor="orangered"
+                      icon={<HiOutlineTrash></HiOutlineTrash>}
+                      onClick={props.deletePage}
+                    />
+                  </Tooltip>
+                </Box>
+              </HStack>
+            </>
+          )}
+          {isDetailsExpanded && (
             <>
               <Box p={2}>
                 <Divider

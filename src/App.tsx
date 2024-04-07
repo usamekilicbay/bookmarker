@@ -26,8 +26,13 @@ export default function App() {
       const tempPages: ISavedPage[] | undefined = loadSavedPages(
         PAGE_SAVE_STORAGE_KEY
       );
+
       if (tempPages) {
         setPages(tempPages);
+      }
+
+      if (isDummyDataActive) {
+        SeedDummyData();
       }
     }
     addPageToPagesList(page);
@@ -101,10 +106,10 @@ export default function App() {
   }
 
   function editPage(pageId: string, reminderText: string) {
-    let page = pages.find((page) => page.id === pageId);
-    if (page && reminderText) {
-      page.reminderText = reminderText;
-      setPage(page);
+    let tempPage = pages.find((page) => page.id === pageId);
+    if (tempPage && reminderText) {
+      tempPage.reminderText = reminderText;
+      setPage(tempPage);
     }
   }
 
@@ -172,12 +177,12 @@ export default function App() {
           ></Settings>
         </Flex>
         <Box w="400px">
-          <Box ps={6}>
+          <Box px={6}>
             <SavePageTextBox setPage={setPage}></SavePageTextBox>
           </Box>
           <List
             spacing={2}
-            pt={2}
+            py={1}
             px={6}
             h="280px"
             overflowY="auto" // Use overflowY="auto" for smooth scrolling
@@ -203,7 +208,6 @@ export default function App() {
               },
             }}
           >
-            {isDummyDataActive && dummyData()}
             {pages
               .slice()
               .reverse()
@@ -230,30 +234,20 @@ export default function App() {
     </>
   );
 
-  function dummyData() {
-    return [...Array(10)].map((_, index) => (
-      <SavedPage
-        key={`page-${index + 1}`}
-        incomingPage={{
-          id: `page-${index + 1}`,
-          url: `https://www.example.com/dummy-page-${index + 1}`,
-          title: `Dummy Saved Page ${index + 1}`,
-          reminderText: `This is a reminder for page ${index + 1}`,
-          saveDate: new Date(),
-        }}
-        deletePage={() =>
-          console.log("Delete Page with ID:", `page-${index + 1}`)
-        }
-        editPage={(editedReminderText: string) =>
-          console.log(
-            "Edit Page with ID:",
-            `page-${index + 1}`,
-            ", New Reminder Text:",
-            editedReminderText
-          )
-        }
-        isAutoDelete={isAutoDelete}
-      />
-    ));
+  function SeedDummyData(): void {
+    const tempPages = Array(10)
+      .fill(null)
+      .map(
+        (_, index) =>
+          ({
+            id: crypto.randomUUID(),
+            reminderText: `Reminder text ${index}`,
+            saveDate: new Date(),
+            title: `Title ${index}`,
+            url: `https://www.example.com/dummy-page-${index}`,
+          } as ISavedPage)
+      );
+
+    setPages([...pages, ...tempPages]);
   }
 }
