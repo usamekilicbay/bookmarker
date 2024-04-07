@@ -118,7 +118,6 @@ export default function SavedPage(props: {
             <>
               <HStack spacing={0}>
                 <Box
-                  as="a"
                   flexGrow={1}
                   borderRadius="sm"
                   padding={1}
