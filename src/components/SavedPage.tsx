@@ -5,6 +5,7 @@ import {
   HiOutlineCheck,
   HiOutlinePencilAlt,
   HiOutlineTrash,
+  HiOutlineX,
 } from "react-icons/hi";
 import {
   Box,
@@ -18,6 +19,7 @@ import {
   ListItem,
   Text,
   Tooltip,
+  VStack,
   useBoolean,
   useToast,
 } from "@chakra-ui/react";
@@ -26,12 +28,15 @@ import { useState } from "react";
 export default function SavedPage(props: {
   incomingPage: ISavedPage;
   deletePage: () => void;
-  editPage: (editedReminderText: string) => void;
+  updatePage: (editedReminderText: string) => void;
   isAutoDelete: boolean;
 }) {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isDetailsExpanded, setIsDetailsExpanded] = useBoolean(false);
   const toast = useToast();
+  const [editedReminderText, setEditedReminderText] = useState<string>(
+    props.incomingPage.reminderText
+  );
 
   const dateObject = new Date(props.incomingPage.saveDate);
   const formattedDate = dateObject.toLocaleDateString("en-US", {
@@ -43,23 +48,44 @@ export default function SavedPage(props: {
     minute: "2-digit",
   });
 
+  const handleOnKeyDownReminderTextEditInput = (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ): void => {
+    if (e.key === "Enter") {
+      handleOnFinishEditingReminderText();
+    }
+  };
+
   const handleOnChangeReminderText = (
     e: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    props.incomingPage.reminderText = e.target.value;
-    console.log(props.incomingPage.reminderText);
+    setEditedReminderText(e.target.value);
+  };
+
+  const handleOnCancelEditingReminderText = () => {
+    setIsEditing(false);
+    setEditedReminderText(props.incomingPage.reminderText);
   };
 
   const handleOnFinishEditingReminderText = () => {
+    if (editedReminderText === props.incomingPage.reminderText) {
+      setEditedReminderText(props.incomingPage.reminderText);
+      return;
+    }
+
     setIsEditing(false);
-    props.editPage(props.incomingPage.reminderText);
+    updatePage();
+  };
+
+  function updatePage() {
+    props.updatePage(editedReminderText);
     toast({
       title: "Reminder text updated successfully",
       status: "success",
       duration: 2000,
       isClosable: true,
     });
-  };
+  }
 
   const handleLinkOnClick = () => {
     window.open(props.incomingPage.url, "_blank");
@@ -87,12 +113,12 @@ export default function SavedPage(props: {
             <HStack spacing={1}>
               <Box flexGrow={1}>
                 <Editable
-                  defaultValue={props.incomingPage.reminderText}
+                  defaultValue={editedReminderText}
                   textAlign="start"
                   p={1}
                   pe={0}
                   startWithEditView
-                  onSubmit={handleOnFinishEditingReminderText}
+                  onKeyDown={handleOnKeyDownReminderTextEditInput}
                 >
                   <EditablePreview />
                   <EditableInput onChange={handleOnChangeReminderText} />
@@ -103,16 +129,26 @@ export default function SavedPage(props: {
                 orientation="vertical"
                 borderColor="orange.500"
               />
-              <Box>
+              <VStack spacing={0.3}>
                 <Tooltip label="Save" hasArrow>
                   <IconButton
                     aria-label="Save changes"
                     variant="ghost"
+                    size="sm"
                     icon={<HiOutlineCheck></HiOutlineCheck>}
                     onClick={handleOnFinishEditingReminderText}
                   />
                 </Tooltip>
-              </Box>
+                <Tooltip label="Cancel" hasArrow>
+                  <IconButton
+                    aria-label="Cancel changes"
+                    variant="ghost"
+                    size="sm"
+                    icon={<HiOutlineX></HiOutlineX>}
+                    onClick={handleOnCancelEditingReminderText}
+                  />
+                </Tooltip>
+              </VStack>
             </HStack>
           ) : (
             <>
