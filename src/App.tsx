@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import "./App.css";
 import SavedPage from "./components/SavedPage";
 import SavePageTextBox from "./components/SavePageTextBox";
@@ -8,7 +8,7 @@ import { Box, Flex, List, useToast } from "@chakra-ui/react";
 import Settings from "./components/Settings";
 import { PAGE_SAVE_STORAGE_KEY } from "./common/constants";
 
-const isDummyDataActive = false;
+const isDummyDataActive = true;
 
 export default function App() {
   const [page, setPage] = useState<ISavedPage>();
@@ -16,6 +16,12 @@ export default function App() {
   const [isDelete, setIsDelete] = useState<boolean>(false);
   const [isAutoDelete, setIsAutoDelete] = useState<boolean>(false);
   const toast = useToast();
+
+  useCallback(() => {
+    if (isDummyDataActive) {
+      SeedDummyData();
+    }
+  }, [pages]);
 
   useEffect(() => {
     savePages();
@@ -29,10 +35,6 @@ export default function App() {
 
       if (tempPages) {
         setPages(tempPages);
-      }
-
-      if (isDummyDataActive) {
-        SeedDummyData();
       }
     }
     addPageToPagesList(page);
@@ -105,7 +107,7 @@ export default function App() {
     });
   }
 
-  function editPage(pageId: string, reminderText: string) {
+  function updatePage(pageId: string, reminderText: string) {
     let tempPage = pages.find((page) => page.id === pageId);
     if (tempPage && reminderText) {
       tempPage.reminderText = reminderText;
@@ -197,14 +199,13 @@ export default function App() {
                 },
               },
               "&::-webkit-scrollbar": {
-                // Set width to 10px permanently
                 width: "5px",
                 borderRadius: "8px",
-                backgroundColor: "transparent", // Ensure scrollbar is truly hidden (unchanged)
+                backgroundColor: "transparent",
               },
               "&::-webkit-scrollbar-thumb": {
                 borderRadius: "8px",
-                backgroundColor: "transparent", // Ensure scrollbar is truly hidden (unchanged)
+                backgroundColor: "transparent",
               },
             }}
           >
@@ -222,8 +223,8 @@ export default function App() {
                     saveDate: page.saveDate,
                   }}
                   deletePage={() => deletePage(page.id)}
-                  editPage={(editedReminderText: string) =>
-                    editPage(page.id, editedReminderText)
+                  updatePage={(editedReminderText: string) =>
+                    updatePage(page.id, editedReminderText)
                   }
                   isAutoDelete={isAutoDelete}
                 ></SavedPage>
@@ -248,6 +249,7 @@ export default function App() {
           } as ISavedPage)
       );
 
+    console.log(pages);
     setPages([...pages, ...tempPages]);
   }
 }
