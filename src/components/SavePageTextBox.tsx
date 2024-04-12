@@ -66,6 +66,7 @@ export default function SavePageTextBox(props: {
             onChange={onChange}
             boxShadow="lg"
             paddingX={2}
+            autoFocus
           />
           <IconButton
             aria-label={"Save page"}
