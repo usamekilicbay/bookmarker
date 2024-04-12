@@ -60,13 +60,15 @@ export default function App() {
           : [...pages, page];
       setPages(updatedPages);
 
-      toast({
-        title: "New page added",
-        description: `There are ${updatedPages.length} saved pages in total`,
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
+      if (existingPageIndex === -1) {
+        toast({
+          title: "New page added",
+          description: `There are ${updatedPages.length} saved pages in total`,
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+        });
+      }
     }
   }
 
