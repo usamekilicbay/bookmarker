@@ -63,9 +63,9 @@ export default function SavePageTextBox(props: {
         reminderText: reminderText,
         saveDate: new Date(),
       });
-    }
 
-    setReminderText("");
+      setReminderText("");
+    }
   };
 
   return (
