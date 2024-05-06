@@ -23,7 +23,19 @@ export default function SavePageTextBox(props: {
     setReminderText(e.target.value);
   };
 
+  const handleOnKeyDownReminderTextSaveInput = async (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ): Promise<void> => {
+    if (e.key === "Enter") {
+      await savePage();
+    }
+  };
+
   const onClickSave = async () => {
+    await savePage();
+  };
+
+  const savePage = async () => {
     if (!reminderText) {
       toast({
         title: "Page could not be saved",
@@ -40,6 +52,7 @@ export default function SavePageTextBox(props: {
       active: true,
       currentWindow: true,
     });
+
     const url = tab.url;
     const title = tab.title;
     if (url && title && reminderText) {
@@ -51,6 +64,8 @@ export default function SavePageTextBox(props: {
         saveDate: new Date(),
       });
     }
+
+    setReminderText("");
   };
 
   return (
@@ -64,9 +79,11 @@ export default function SavePageTextBox(props: {
             focusBorderColor="purple.500"
             errorBorderColor="crimson"
             onChange={onChange}
+            onKeyDown={handleOnKeyDownReminderTextSaveInput}
             boxShadow="lg"
             paddingX={2}
             autoFocus
+            value={reminderText}
           />
           <IconButton
             aria-label={"Save page"}
