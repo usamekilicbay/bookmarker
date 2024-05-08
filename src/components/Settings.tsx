@@ -18,59 +18,34 @@ import {
 import { HiMagnifyingGlass, HiOutlineArrowPath } from "react-icons/hi2";
 import { ISavedPage as ISavedPage } from "../models/saved-page";
 import saveAs from "file-saver";
-import {
-  PAGE_SAVE_STORAGE_KEY,
-  SETTINGS_STORAGE_KEY,
-} from "../common/constants";
+import { PAGE_SAVE_STORAGE_KEY } from "../common/constants";
 import { useEffect, useState } from "react";
+import { SettingsContext } from "../contexts/settings-context";
+import { useSettingsContext } from "../contexts/settings-context";
 
 export default function Settings(props: {
+  setSettings: (settings: ISettings) => void;
   deleteAllSavedPages: () => void;
   loadSavedPages: (storageKey: string) => void;
   importPages: (file: File) => void;
   getSavedPage: (id: string) => ISavedPage | undefined;
   savedPages: ISavedPage[];
-  setIsAutoDelete: (autoDelete: boolean) => void;
 }) {
-  const [settings, setSettings] = useState<ISettings>();
+  const settings = useSettingsContext();
   const [isAutoDeleteChecked, setIsAutoDeleteChecked] =
     useState<boolean>(false);
   const toast = useToast();
 
   useEffect(() => {
-    const tempSettings = loadSettings();
-    setSettings(tempSettings);
-    setIsAutoDeleteChecked(tempSettings.autoDelete);
-  }, []);
-
-  useEffect(() => {
-    if (!settings) return;
     setIsAutoDeleteChecked(settings.autoDelete);
-    if (settings === loadSettings()) return;
-    saveSettings();
   }, [settings]);
-
-  function loadSettings(): ISettings {
-    const value = window.localStorage.getItem(SETTINGS_STORAGE_KEY);
-    if (value) {
-      const tempSettings = JSON.parse(value) as ISettings;
-      return tempSettings;
-    }
-    return {} as ISettings;
-  }
-
-  function saveSettings(): void {
-    window.localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
-  }
 
   const handleOnChangeAutoDelete = (): void => {
     const currentIsAutoDeleteChecked = !isAutoDeleteChecked;
-    setSettings({
+    props.setSettings({
       ...settings,
       autoDelete: currentIsAutoDeleteChecked,
     });
-
-    props.setIsAutoDelete(currentIsAutoDeleteChecked);
   };
 
   const handleExportData = () => {
@@ -116,104 +91,110 @@ export default function Settings(props: {
 
   return (
     <>
-      <Popover placement="left-start">
-        <PopoverTrigger>
-          <IconButton
-            aria-label="Settings"
-            icon={<HiOutlineCog></HiOutlineCog>}
-            variant="ghost"
-            textColor="orange.500"
-            _hover={{
-              textColor: "purple.500",
-              transform: "rotate(90Deg)",
-              transition: "transform 0.3s ease-in-out",
-            }}
-          />
-        </PopoverTrigger>
-        <PopoverContent
-          bg="orange.50"
-          borderColor="orange.500"
-          w="50px"
-          rounded="md"
-          p={1}
-        >
-          <Box>
-            <VStack>
-              <Tooltip
-                label={`Auto delete (${
-                  isAutoDeleteChecked ? "active" : "disabled"
-                }) saved page after opening`}
-                placement="left"
-                hasArrow
-              >
-                <Box mt={2}>
-                  <Switch
-                    aria-label="Toggle auto delete"
-                    variant="ghost"
-                    size="sm"
-                    isChecked={isAutoDeleteChecked}
-                    onChange={handleOnChangeAutoDelete}
-                  ></Switch>
-                </Box>
-              </Tooltip>
-              <Tooltip label="Reload saved pages" placement="left" hasArrow>
-                <IconButton
-                  aria-label="Reload saved pages"
-                  variant="ghost"
-                  onClick={handleOnLoadSavedPages}
-                  icon={<HiOutlineArrowPath></HiOutlineArrowPath>}
-                ></IconButton>
-              </Tooltip>
-              <Tooltip label="Get saved page" placement="left" hasArrow>
-                <IconButton
-                  aria-label={"Get saved page"}
-                  variant="ghost"
-                  onClick={() => props.getSavedPage(crypto.randomUUID())}
-                  icon={<HiMagnifyingGlass></HiMagnifyingGlass>}
-                ></IconButton>
-              </Tooltip>
-              <Tooltip
-                label="Export saved pages as JSON"
-                placement="left"
-                hasArrow
-              >
-                <IconButton
-                  aria-label={"Export saved pages as JSON"}
-                  variant="ghost"
-                  onClick={handleExportData}
-                  icon={<HiOutlineDownload></HiOutlineDownload>}
-                ></IconButton>
-              </Tooltip>
-              <Tooltip label="Import pages as JSON" placement="left" hasArrow>
-                <label>
-                  <input
-                    id="saved-pages-import-input"
-                    type="file"
-                    aria-label={"Input for importing saved pages as JSON"}
-                    onChange={handleImportData}
-                    style={{ display: "none" }}
-                  ></input>
+      <SettingsContext.Provider value={settings}>
+        <Popover placement="left-start">
+          <PopoverTrigger>
+            <IconButton
+              aria-label="Settings"
+              icon={<HiOutlineCog></HiOutlineCog>}
+              variant="ghost"
+              textColor="orange.500"
+              _hover={{
+                textColor: "purple.500",
+                transform: "rotate(90Deg)",
+                transition: "transform 0.3s ease-in-out",
+              }}
+            />
+          </PopoverTrigger>
+          <PopoverContent
+            bg="orange.50"
+            borderColor="orange.500"
+            w="50px"
+            rounded="md"
+            p={1}
+          >
+            <Box>
+              <VStack>
+                <Tooltip
+                  label={`Auto delete (${
+                    isAutoDeleteChecked ? "active" : "disabled"
+                  }) saved page after opening`}
+                  placement="left"
+                  hasArrow
+                >
+                  <Box mt={2}>
+                    <Switch
+                      aria-label="Toggle auto delete"
+                      variant="ghost"
+                      size="sm"
+                      isChecked={isAutoDeleteChecked}
+                      onChange={handleOnChangeAutoDelete}
+                    ></Switch>
+                  </Box>
+                </Tooltip>
+                <Tooltip label="Reload saved pages" placement="left" hasArrow>
                   <IconButton
-                    as="span"
-                    aria-label={"Import pages as JSON"}
+                    aria-label="Reload saved pages"
                     variant="ghost"
-                    icon={<HiOutlineUpload></HiOutlineUpload>}
+                    onClick={handleOnLoadSavedPages}
+                    icon={<HiOutlineArrowPath></HiOutlineArrowPath>}
                   ></IconButton>
-                </label>
-              </Tooltip>
-              <Tooltip label="Delete all saved pages" placement="left" hasArrow>
-                <IconButton
-                  aria-label={"Delete all saved pages"}
-                  variant="ghost"
-                  textColor="orangered"
-                  onClick={props.deleteAllSavedPages}
-                  icon={<HiOutlineTrash></HiOutlineTrash>}
-                ></IconButton>
-              </Tooltip>
-            </VStack>
-          </Box>
-        </PopoverContent>
-      </Popover>
+                </Tooltip>
+                <Tooltip label="Get saved page" placement="left" hasArrow>
+                  <IconButton
+                    aria-label={"Get saved page"}
+                    variant="ghost"
+                    onClick={() => props.getSavedPage(crypto.randomUUID())}
+                    icon={<HiMagnifyingGlass></HiMagnifyingGlass>}
+                  ></IconButton>
+                </Tooltip>
+                <Tooltip
+                  label="Export saved pages as JSON"
+                  placement="left"
+                  hasArrow
+                >
+                  <IconButton
+                    aria-label={"Export saved pages as JSON"}
+                    variant="ghost"
+                    onClick={handleExportData}
+                    icon={<HiOutlineDownload></HiOutlineDownload>}
+                  ></IconButton>
+                </Tooltip>
+                <Tooltip label="Import pages as JSON" placement="left" hasArrow>
+                  <label>
+                    <input
+                      id="saved-pages-import-input"
+                      type="file"
+                      aria-label={"Input for importing saved pages as JSON"}
+                      onChange={handleImportData}
+                      style={{ display: "none" }}
+                    ></input>
+                    <IconButton
+                      as="span"
+                      aria-label={"Import pages as JSON"}
+                      variant="ghost"
+                      icon={<HiOutlineUpload></HiOutlineUpload>}
+                    ></IconButton>
+                  </label>
+                </Tooltip>
+                <Tooltip
+                  label="Delete all saved pages"
+                  placement="left"
+                  hasArrow
+                >
+                  <IconButton
+                    aria-label={"Delete all saved pages"}
+                    variant="ghost"
+                    textColor="orangered"
+                    onClick={props.deleteAllSavedPages}
+                    icon={<HiOutlineTrash></HiOutlineTrash>}
+                  ></IconButton>
+                </Tooltip>
+              </VStack>
+            </Box>
+          </PopoverContent>
+        </Popover>
+      </SettingsContext.Provider>
     </>
   );
 }

@@ -24,12 +24,12 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import { useSettingsContext } from "../contexts/settings-context";
 
 export default function SavedPage(props: {
   incomingPage: ISavedPage;
   deletePage: () => void;
   updatePage: (editedReminderText: string) => void;
-  isAutoDelete: boolean;
 }) {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isDetailsExpanded, setIsDetailsExpanded] = useBoolean(false);
@@ -37,6 +37,7 @@ export default function SavedPage(props: {
   const [editedReminderText, setEditedReminderText] = useState<string>(
     props.incomingPage.reminderText
   );
+  const isAutoDelete = useSettingsContext().autoDelete;
 
   const dateObject = new Date(props.incomingPage.saveDate);
   const formattedDate = dateObject.toLocaleDateString("en-US", {
@@ -89,7 +90,7 @@ export default function SavedPage(props: {
 
   const handleLinkOnClick = () => {
     window.open(props.incomingPage.url, "_blank");
-    if (props.isAutoDelete) {
+    if (isAutoDelete) {
       props.deletePage();
     }
   };

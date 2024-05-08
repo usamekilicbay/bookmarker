@@ -7,6 +7,8 @@ import Links from "./components/Links";
 import { Box, Flex, List, useToast } from "@chakra-ui/react";
 import Settings from "./components/Settings";
 import { PAGE_SAVE_STORAGE_KEY } from "./common/constants";
+import { SettingsContext } from "./contexts/settings-context";
+import { loadSettings, saveSettings } from "./services/settings-service";
 
 const isDummyDataActive = true;
 
@@ -14,8 +16,20 @@ export default function App() {
   const [page, setPage] = useState<ISavedPage>();
   const [pages, setPages] = useState<ISavedPage[]>([]);
   const [isDelete, setIsDelete] = useState<boolean>(false);
-  const [isAutoDelete, setIsAutoDelete] = useState<boolean>(false);
+  const [settings, setSettings] = useState<ISettings>();
+
   const toast = useToast();
+
+  useEffect(() => {
+    const tempSettings = loadSettings();
+    setSettings(tempSettings);
+  }, []);
+
+  useEffect(() => {
+    if (settings && settings !== loadSettings()) {
+      saveSettings(settings);
+    }
+  }, [settings]);
 
   useCallback(() => {
     if (isDummyDataActive) {
@@ -166,74 +180,77 @@ export default function App() {
     };
   }
 
+  if (!settings) return;
+
   return (
     <>
-      <Box>
-        <Flex justify="space-between" align="center">
-          <Links></Links>
-          <Settings
-            deleteAllSavedPages={deleteAllSavedPages}
-            loadSavedPages={() => loadSavedPages(PAGE_SAVE_STORAGE_KEY)}
-            importPages={importPages}
-            getSavedPage={() => getSavedPage(crypto.randomUUID())}
-            savedPages={pages}
-            setIsAutoDelete={setIsAutoDelete}
-          ></Settings>
-        </Flex>
-        <Box w="400px">
-          <Box px={6}>
-            <SavePageTextBox setPage={setPage}></SavePageTextBox>
-          </Box>
-          <List
-            spacing={2}
-            py={1}
-            px={6}
-            h="280px"
-            overflowY="auto" // Use overflowY="auto" for smooth scrolling
-            sx={{
-              "&:hover": {
-                // Show scrollbar on hover over container
+      <SettingsContext.Provider value={settings}>
+        <Box>
+          <Flex justify="space-between" align="center">
+            <Links></Links>
+            <Settings
+              setSettings={setSettings}
+              deleteAllSavedPages={deleteAllSavedPages}
+              loadSavedPages={() => loadSavedPages(PAGE_SAVE_STORAGE_KEY)}
+              importPages={importPages}
+              getSavedPage={() => getSavedPage(crypto.randomUUID())}
+              savedPages={pages}
+            ></Settings>
+          </Flex>
+          <Box w="400px">
+            <Box px={6}>
+              <SavePageTextBox setPage={setPage}></SavePageTextBox>
+            </Box>
+            <List
+              spacing={2}
+              py={1}
+              px={6}
+              h="280px"
+              overflowY="auto" // Use overflowY="auto" for smooth scrolling
+              sx={{
+                "&:hover": {
+                  // Show scrollbar on hover over container
+                  "&::-webkit-scrollbar": {
+                    backgroundColor: `rgba(0, 0, 0, 0.03)`,
+                  },
+                  "&::-webkit-scrollbar-thumb": {
+                    backgroundColor: `rgba(0, 0, 0, 0.3)`, // Adjust thumb color
+                  },
+                },
                 "&::-webkit-scrollbar": {
-                  backgroundColor: `rgba(0, 0, 0, 0.03)`,
+                  width: "5px",
+                  borderRadius: "8px",
+                  backgroundColor: "transparent",
                 },
                 "&::-webkit-scrollbar-thumb": {
-                  backgroundColor: `rgba(0, 0, 0, 0.3)`, // Adjust thumb color
+                  borderRadius: "8px",
+                  backgroundColor: "transparent",
                 },
-              },
-              "&::-webkit-scrollbar": {
-                width: "5px",
-                borderRadius: "8px",
-                backgroundColor: "transparent",
-              },
-              "&::-webkit-scrollbar-thumb": {
-                borderRadius: "8px",
-                backgroundColor: "transparent",
-              },
-            }}
-          >
-            {pages
-              .slice()
-              .reverse()
-              .map((page) => (
-                <SavedPage
-                  key={page.id}
-                  incomingPage={{
-                    id: page.id,
-                    url: page.url,
-                    title: page.title,
-                    reminderText: page.reminderText,
-                    saveDate: page.saveDate,
-                  }}
-                  deletePage={() => deletePage(page.id)}
-                  updatePage={(editedReminderText: string) =>
-                    updatePage(page.id, editedReminderText)
-                  }
-                  isAutoDelete={isAutoDelete}
-                ></SavedPage>
-              ))}
-          </List>
+              }}
+            >
+              {pages
+                .slice()
+                .reverse()
+                .map((page) => (
+                  <SavedPage
+                    key={page.id}
+                    incomingPage={{
+                      id: page.id,
+                      url: page.url,
+                      title: page.title,
+                      reminderText: page.reminderText,
+                      saveDate: page.saveDate,
+                    }}
+                    deletePage={() => deletePage(page.id)}
+                    updatePage={(editedReminderText: string) =>
+                      updatePage(page.id, editedReminderText)
+                    }
+                  ></SavedPage>
+                ))}
+            </List>
+          </Box>
         </Box>
-      </Box>
+      </SettingsContext.Provider>
     </>
   );
 
