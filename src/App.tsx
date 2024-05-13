@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import SavedPage from "./components/SavedPage";
 import SavePageTextBox from "./components/SavePageTextBox";
@@ -10,7 +10,8 @@ import { PAGE_SAVE_STORAGE_KEY } from "./common/constants";
 import { SettingsContext } from "./contexts/settings-context";
 import { loadSettings, saveSettings } from "./services/settings-service";
 
-const isDummyDataActive = true;
+const IS_DUMMY_DATA_ACTIVE = true;
+const DUMMY_DATA_COUNT = 10;
 
 export default function App() {
   const [page, setPage] = useState<ISavedPage>();
@@ -31,30 +32,26 @@ export default function App() {
     }
   }, [settings]);
 
-  useCallback(() => {
-    if (isDummyDataActive) {
-      SeedDummyData();
-    }
-  }, [pages]);
-
   useEffect(() => {
     savePages();
+
+    if (pages.length > 0) return;
+
+    const tempPages = loadSavedPages(PAGE_SAVE_STORAGE_KEY);
+    if (tempPages) {
+      setPages(tempPages);
+      if (IS_DUMMY_DATA_ACTIVE) {
+        SeedDummyData(tempPages);
+      }
+    }
   }, [pages]);
 
   useEffect(() => {
-    if (pages.length === 0) {
-      const tempPages: ISavedPage[] | undefined = loadSavedPages(
-        PAGE_SAVE_STORAGE_KEY
-      );
-
-      if (tempPages) {
-        setPages(tempPages);
-      }
-    }
     addPageToPagesList(page);
   }, [page]);
 
   function savePages(): void {
+    // TODO: reconsider isDelete usage
     if (isDelete || pages.length > 0) {
       window.localStorage.setItem(PAGE_SAVE_STORAGE_KEY, JSON.stringify(pages));
       setIsDelete(false);
@@ -254,8 +251,10 @@ export default function App() {
     </>
   );
 
-  function SeedDummyData(): void {
-    const tempPages = Array(10)
+  function SeedDummyData(pages: ISavedPage[]): void {
+    const requiredDummyDataCount = Math.max(0, DUMMY_DATA_COUNT - pages.length);
+
+    const tempPages = Array(requiredDummyDataCount)
       .fill(null)
       .map(
         (_, index) =>
