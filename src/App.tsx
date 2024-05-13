@@ -7,11 +7,9 @@ import Links from "./components/Links";
 import { Box, Flex, List, useToast } from "@chakra-ui/react";
 import Settings from "./components/Settings";
 import { PAGE_SAVE_STORAGE_KEY } from "./common/constants";
+import { DUMMY_DATA_COUNT } from "./common/dev-constants";
 import { SettingsContext } from "./contexts/settings-context";
 import { loadSettings, saveSettings } from "./services/settings-service";
-
-const IS_DUMMY_DATA_ACTIVE = true;
-const DUMMY_DATA_COUNT = 10;
 
 export default function App() {
   const [page, setPage] = useState<ISavedPage>();
@@ -40,9 +38,6 @@ export default function App() {
     const tempPages = loadSavedPages(PAGE_SAVE_STORAGE_KEY);
     if (tempPages) {
       setPages(tempPages);
-      if (IS_DUMMY_DATA_ACTIVE) {
-        SeedDummyData(tempPages);
-      }
     }
   }, [pages]);
 
@@ -192,6 +187,8 @@ export default function App() {
               importPages={importPages}
               getSavedPage={() => getSavedPage(crypto.randomUUID())}
               savedPages={pages}
+              seedDummyPages={() => SeedDummyPages(pages)}
+              removeDummyPages={RemoveDummyPages}
             ></Settings>
           </Flex>
           <Box w="400px">
@@ -251,10 +248,10 @@ export default function App() {
     </>
   );
 
-  function SeedDummyData(pages: ISavedPage[]): void {
-    const requiredDummyDataCount = Math.max(0, DUMMY_DATA_COUNT - pages.length);
-
-    const tempPages = Array(requiredDummyDataCount)
+  function SeedDummyPages(pages: ISavedPage[]): void {
+    // const requiredDummyDataCount = Math.max(0, DUMMY_DATA_COUNT - pages.length);
+    // const tempPages = Array(requiredDummyDataCount)
+    const tempPages = Array(DUMMY_DATA_COUNT)
       .fill(null)
       .map(
         (_, index) =>
@@ -262,12 +259,33 @@ export default function App() {
             id: crypto.randomUUID(),
             reminderText: `Reminder text ${index}`,
             saveDate: new Date(),
-            title: `Title ${index}`,
+            title: `Dummy ${index}`,
             url: `https://www.example.com/dummy-page-${index}`,
           } as ISavedPage)
       );
 
     console.log(pages);
     setPages([...pages, ...tempPages]);
+
+    toast({
+      title: "Dummy pages added",
+      status: "success",
+      duration: 2000,
+      isClosable: true,
+    });
+  }
+
+  function RemoveDummyPages(): void {
+    setIsDelete(true);
+    let tempPages: ISavedPage[] = [...pages];
+    tempPages = tempPages.filter((p) => !p.title.includes("Dummy"));
+    setPages(tempPages);
+
+    toast({
+      title: "DummyPages deleted successfully",
+      status: "success",
+      duration: 2000,
+      isClosable: true,
+    });
   }
 }

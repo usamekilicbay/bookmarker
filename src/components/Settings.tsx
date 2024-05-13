@@ -14,14 +14,18 @@ import {
   HiOutlineDownload,
   HiOutlineUpload,
   HiOutlineTrash,
+  HiOutlineSparkles,
 } from "react-icons/hi";
 import { HiMagnifyingGlass, HiOutlineArrowPath } from "react-icons/hi2";
 import { ISavedPage as ISavedPage } from "../models/saved-page";
 import saveAs from "file-saver";
 import { PAGE_SAVE_STORAGE_KEY } from "../common/constants";
+import { IS_DEV_MODE_ACTIVE } from "../common/dev-constants";
 import { useEffect, useState } from "react";
-import { SettingsContext } from "../contexts/settings-context";
-import { useSettingsContext } from "../contexts/settings-context";
+import {
+  SettingsContext,
+  useSettingsContext,
+} from "../contexts/settings-context";
 
 export default function Settings(props: {
   setSettings: (settings: ISettings) => void;
@@ -29,6 +33,8 @@ export default function Settings(props: {
   loadSavedPages: (storageKey: string) => void;
   importPages: (file: File) => void;
   getSavedPage: (id: string) => ISavedPage | undefined;
+  seedDummyPages: () => void;
+  removeDummyPages: () => void;
   savedPages: ISavedPage[];
 }) {
   const settings = useSettingsContext();
@@ -190,6 +196,36 @@ export default function Settings(props: {
                     icon={<HiOutlineTrash></HiOutlineTrash>}
                   ></IconButton>
                 </Tooltip>
+                {IS_DEV_MODE_ACTIVE && (
+                  <>
+                    <Tooltip
+                      label="Generate dummy pages"
+                      placement="left"
+                      hasArrow
+                    >
+                      <IconButton
+                        aria-label={"Generate dummy pages"}
+                        variant="ghost"
+                        textColor="purple"
+                        onClick={props.seedDummyPages}
+                        icon={<HiOutlineSparkles></HiOutlineSparkles>}
+                      ></IconButton>
+                    </Tooltip>
+                    <Tooltip
+                      label="Remove dummy pages"
+                      placement="left"
+                      hasArrow
+                    >
+                      <IconButton
+                        aria-label={"Remove dummy pages"}
+                        variant="ghost"
+                        textColor="purple"
+                        onClick={props.removeDummyPages}
+                        icon={<HiOutlineTrash></HiOutlineTrash>}
+                      ></IconButton>
+                    </Tooltip>
+                  </>
+                )}
               </VStack>
             </Box>
           </PopoverContent>
