@@ -50,7 +50,7 @@
     "Summon_Save_Input": {
       "suggested_key": {
         "default": "Ctrl+B",
-        "mac": "Command+L"
+        "mac": "Command+B"
       },
       "description": "Open the input field to save current page with a reminder text."
     }
