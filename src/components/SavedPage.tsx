@@ -54,6 +54,8 @@ export default function SavedPage(props: {
   ): void => {
     if (e.key === "Enter") {
       handleOnFinishEditingReminderText();
+    } else if (e.key === "Escape") {
+      handleOnCancelEditingReminderText();
     }
   };
 
@@ -69,8 +71,15 @@ export default function SavedPage(props: {
   };
 
   const handleOnFinishEditingReminderText = () => {
+    console.log(props.incomingPage.reminderText);
     if (editedReminderText === props.incomingPage.reminderText) {
       setEditedReminderText(props.incomingPage.reminderText);
+      toast({
+        title: "Reminder text not changed",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
       return;
     }
 
@@ -78,7 +87,14 @@ export default function SavedPage(props: {
     updatePage();
   };
 
-  function updatePage() {
+  const handleOnClickLink = () => {
+    window.open(props.incomingPage.url, "_blank");
+    if (isAutoDelete) {
+      props.deletePage();
+    }
+  };
+
+  const updatePage = () => {
     props.updatePage(editedReminderText);
     toast({
       title: "Reminder text updated successfully",
@@ -86,13 +102,6 @@ export default function SavedPage(props: {
       duration: 2000,
       isClosable: true,
     });
-  }
-
-  const handleLinkOnClick = () => {
-    window.open(props.incomingPage.url, "_blank");
-    if (isAutoDelete) {
-      props.deletePage();
-    }
   };
 
   return (
@@ -160,7 +169,7 @@ export default function SavedPage(props: {
                   padding={1}
                   textAlign="start"
                   textColor="black.alpha.50"
-                  onClick={handleLinkOnClick}
+                  onClick={handleOnClickLink}
                 >
                   <Link isTruncated>{props.incomingPage.reminderText}</Link>
                 </Box>
