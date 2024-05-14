@@ -116,10 +116,10 @@ export default function App() {
   }
 
   function updatePage(pageId: string, reminderText: string) {
-    let tempPage = pages.find((page) => page.id === pageId);
-    if (tempPage && reminderText) {
-      tempPage.reminderText = reminderText;
-      setPage(tempPage);
+    const originalPage = pages.find((page) => page.id === pageId);
+    if (originalPage && reminderText) {
+      const updatedPage = { ...originalPage, reminderText: reminderText };
+      setPage(updatedPage);
     }
   }
 
