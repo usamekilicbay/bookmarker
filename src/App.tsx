@@ -10,10 +10,12 @@ import { PAGE_SAVE_STORAGE_KEY } from "./common/constants";
 import { DUMMY_DATA_COUNT } from "./common/dev-constants";
 import { SettingsContext } from "./contexts/settings-context";
 import { loadSettings, saveSettings } from "./services/settings-service";
+import { SearchBox } from "./components/SearchBox";
 
 export default function App() {
   const [page, setPage] = useState<ISavedPage>();
   const [pages, setPages] = useState<ISavedPage[]>([]);
+  const [shownPages, setShownPages] = useState<ISavedPage[]>([]);
   const [isDelete, setIsDelete] = useState<boolean>(false);
   const [settings, setSettings] = useState<ISettings>();
 
@@ -32,6 +34,7 @@ export default function App() {
 
   useEffect(() => {
     savePages();
+    setShownPages(pages);
 
     if (pages.length > 0) return;
 
@@ -172,6 +175,28 @@ export default function App() {
     };
   }
 
+  function searchPages(searchText: string | undefined): void {
+    if (!searchText) {
+      setShownPages(pages);
+      return;
+    } else if (searchText.length < 3) {
+      return;
+    }
+
+    const searchRegex = new RegExp(searchText, "i");
+
+    const filteredPages = pages.filter(
+      (x) =>
+        searchRegex.test(x.reminderText) ||
+        searchRegex.test(x.title) ||
+        searchRegex.test(x.url)
+    );
+
+    filteredPages.sort((a, b) => a.saveDate.getTime() - b.saveDate.getTime());
+    filteredPages.reverse();
+    setShownPages(filteredPages);
+  }
+
   if (!settings) return;
 
   return (
@@ -193,6 +218,7 @@ export default function App() {
           </Flex>
           <Box w="400px">
             <Box px={6}>
+              <SearchBox search={searchPages}></SearchBox>
               <SavePageTextBox setPage={setPage}></SavePageTextBox>
             </Box>
             <List
@@ -222,7 +248,7 @@ export default function App() {
                 },
               }}
             >
-              {pages
+              {shownPages
                 .slice()
                 .reverse()
                 .map((page) => (
