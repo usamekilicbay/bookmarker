@@ -4,13 +4,21 @@ import SavedPage from "./components/SavedPage";
 import SavePageTextBox from "./components/SavePageTextBox";
 import { ISavedPage } from "./models/saved-page";
 import Links from "./components/Links";
-import { Box, Flex, List, useToast } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  IconButton,
+  List,
+  useBoolean,
+  useToast,
+} from "@chakra-ui/react";
 import Settings from "./components/Settings";
 import { PAGE_SAVE_STORAGE_KEY } from "./common/constants";
 import { DUMMY_DATA_COUNT } from "./common/dev-constants";
 import { SettingsContext } from "./contexts/settings-context";
 import { loadSettings, saveSettings } from "./services/settings-service";
 import { SearchBox } from "./components/SearchBox";
+import { HiPlus, HiSearch } from "react-icons/hi";
 
 export default function App() {
   const [page, setPage] = useState<ISavedPage>();
@@ -18,6 +26,7 @@ export default function App() {
   const [shownPages, setShownPages] = useState<ISavedPage[]>([]);
   const [isDelete, setIsDelete] = useState<boolean>(false);
   const [settings, setSettings] = useState<ISettings>();
+  const [searchBoxToggle, setSearchBoxToggle] = useBoolean(false);
 
   const toast = useToast();
 
@@ -184,7 +193,6 @@ export default function App() {
     }
 
     const searchRegex = new RegExp(searchText, "i");
-
     const filteredPages = pages.filter(
       (x) =>
         searchRegex.test(x.reminderText) ||
@@ -217,9 +225,34 @@ export default function App() {
             ></Settings>
           </Flex>
           <Box w="400px">
+            <Flex mx={150}>
+              <Flex
+                justifyContent="end"
+                transition="flex 0.3s ease-in-out" // Set transition for flex
+                flex={searchBoxToggle ? 1 : 0}
+              >
+                <IconButton
+                  aria-label="Search Box/Reminder Text Save Toggle"
+                  onClick={setSearchBoxToggle.toggle}
+                  icon={
+                    searchBoxToggle ? <HiPlus></HiPlus> : <HiSearch></HiSearch>
+                  }
+                  variant="ghost"
+                  textColor="orange.500"
+                  _hover={{
+                    textColor: "purple.500",
+                    transform: "rotate(90Deg)",
+                    transition: "transform 0.3s ease-in-out",
+                  }}
+                ></IconButton>
+              </Flex>
+            </Flex>
             <Box px={6}>
-              <SearchBox search={searchPages}></SearchBox>
-              <SavePageTextBox setPage={setPage}></SavePageTextBox>
+              {searchBoxToggle ? (
+                <SearchBox search={searchPages}></SearchBox>
+              ) : (
+                <SavePageTextBox setPage={setPage}></SavePageTextBox>
+              )}
             </Box>
             <List
               spacing={2}
