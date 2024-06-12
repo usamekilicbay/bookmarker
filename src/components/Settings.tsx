@@ -67,12 +67,11 @@ export default function Settings(props: {
     });
   };
 
-  function handleImportData(event: React.ChangeEvent<HTMLInputElement>): void {
+  const handleImportData = (event: React.ChangeEvent<HTMLInputElement>) => {
     const target = event.target as HTMLInputElement & { files: FileList };
     const file = target.files[0];
     if (file && file.type === "application/json") {
       props.importPages(file);
-
       toast({
         title: "Data imported successfully",
         status: "success",
@@ -89,7 +88,7 @@ export default function Settings(props: {
       duration: 2000,
       isClosable: true,
     });
-  }
+  };
 
   const handleOnLoadSavedPages = (): void => {
     props.loadSavedPages(PAGE_SAVE_STORAGE_KEY);
@@ -130,6 +129,7 @@ export default function Settings(props: {
                 >
                   <Box mt={2}>
                     <Switch
+                      id="auto_delete_toggle"
                       aria-label="Toggle auto delete"
                       variant="ghost"
                       size="sm"
@@ -172,7 +172,7 @@ export default function Settings(props: {
                       id="saved-pages-import-input"
                       type="file"
                       aria-label={"Input for importing saved pages as JSON"}
-                      onChange={handleImportData}
+                      onChange={() => console.log("annen")}
                       style={{ display: "none" }}
                     ></input>
                     <IconButton
