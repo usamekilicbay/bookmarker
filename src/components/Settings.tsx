@@ -172,7 +172,7 @@ export default function Settings(props: {
                       id="saved-pages-import-input"
                       type="file"
                       aria-label={"Input for importing saved pages as JSON"}
-                      onChange={() => console.log("annen")}
+                      onChange={handleImportData}
                       style={{ display: "none" }}
                     ></input>
                     <IconButton
