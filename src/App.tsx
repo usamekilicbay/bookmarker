@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import SavedPage from "./components/SavedPage";
-import SavePageTextBox from "./components/SavePageTextBox";
 import { ISavedPage } from "./models/saved-page";
 import Links from "./components/Links";
 import { Box, Flex, List, useToast } from "@chakra-ui/react";
@@ -10,10 +9,12 @@ import { PAGE_SAVE_STORAGE_KEY } from "./common/constants";
 import { DUMMY_DATA_COUNT } from "./common/dev-constants";
 import { SettingsContext } from "./contexts/settings-context";
 import { loadSettings, saveSettings } from "./services/settings-service";
+import { Boxes } from "./components/Boxes";
 
 export default function App() {
   const [page, setPage] = useState<ISavedPage>();
   const [pages, setPages] = useState<ISavedPage[]>([]);
+  const [shownPages, setShownPages] = useState<ISavedPage[]>([]);
   const [isDelete, setIsDelete] = useState<boolean>(false);
   const [settings, setSettings] = useState<ISettings>();
 
@@ -32,6 +33,7 @@ export default function App() {
 
   useEffect(() => {
     savePages();
+    setShownPages(pages);
 
     if (pages.length > 0) return;
 
@@ -172,6 +174,25 @@ export default function App() {
     };
   }
 
+  function searchPages(searchText: string | undefined): void {
+    if (!searchText) {
+      setShownPages(pages);
+      return;
+    }
+
+    const searchRegex = new RegExp(searchText, "i");
+    const filteredPages = pages.filter(
+      (x) =>
+        searchRegex.test(x.reminderText) ||
+        searchRegex.test(x.title) ||
+        searchRegex.test(x.url)
+    );
+
+    filteredPages.sort((a, b) => (a < b ? 1 : -1));
+    filteredPages.reverse();
+    setShownPages(filteredPages);
+  }
+
   if (!settings) return;
 
   return (
@@ -192,9 +213,7 @@ export default function App() {
             ></Settings>
           </Flex>
           <Box w="400px">
-            <Box px={6}>
-              <SavePageTextBox setPage={setPage}></SavePageTextBox>
-            </Box>
+            <Boxes searchPages={searchPages} setPage={setPage}></Boxes>
             <List
               spacing={2}
               py={1}
@@ -222,7 +241,7 @@ export default function App() {
                 },
               }}
             >
-              {pages
+              {shownPages
                 .slice()
                 .reverse()
                 .map((page) => (

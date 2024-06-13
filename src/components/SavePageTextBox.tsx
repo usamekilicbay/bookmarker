@@ -5,6 +5,7 @@ import { HiPlus } from "react-icons/hi";
 import { REMINDER_TEXT_MIN_LENGTH } from "../common/constants";
 
 export default function SavePageTextBox(props: {
+  isActive: boolean;
   setPage: (page: ISavedPage) => void;
 }) {
   const [reminderText, setReminderText] = useState<string>();
@@ -72,27 +73,32 @@ export default function SavePageTextBox(props: {
     <>
       <Box id="save_text_box" marginY={5}>
         <Flex>
-          <Input
-            isInvalid={isValid}
-            variant="flushed"
-            placeholder="Enter something to remember"
-            focusBorderColor="purple.500"
-            errorBorderColor="crimson"
-            onChange={onChange}
-            onKeyDown={handleOnKeyDownReminderTextSaveInput}
-            boxShadow="lg"
-            paddingX={2}
-            autoFocus
-            value={reminderText}
-          />
+          {props.isActive && (
+            <Input
+              id="save_page_input"
+              isInvalid={isValid}
+              variant="flushed"
+              placeholder="Enter something to remember"
+              focusBorderColor="purple.500"
+              errorBorderColor="crimson"
+              onChange={onChange}
+              onKeyDown={handleOnKeyDownReminderTextSaveInput}
+              boxShadow="lg"
+              paddingX={2}
+              autoFocus
+              value={reminderText}
+            />
+          )}
           <IconButton
             aria-label={"Save page"}
             variant="ghost"
             icon={<HiPlus></HiPlus>}
             fontSize="x-large"
-            textColor={isValid ? "purple.500" : "orangered"}
+            textColor={isValid || props.isActive ? "purple.500" : "orangered"}
             onClick={onClickSave}
-            transform={isValid ? "rotate(0Deg)" : "rotate(-45Deg)"}
+            transform={
+              isValid || props.isActive ? "rotate(0Deg)" : "rotate(-45Deg)"
+            }
             _hover={{
               transform: "scale(1.5)",
               transition: "transform 0.3s ease-in-out",
