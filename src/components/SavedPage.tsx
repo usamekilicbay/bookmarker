@@ -23,7 +23,7 @@ import {
   useBoolean,
   useToast,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSettingsContext } from "../contexts/settings-context";
 
 export default function SavedPage(props: {
@@ -48,6 +48,21 @@ export default function SavedPage(props: {
     hour: "2-digit",
     minute: "2-digit",
   });
+
+  const [isCtrlPressed, setIsCtrlPressed] = useBoolean(false);
+
+  const handleCtrlKeyDown = (event: KeyboardEvent) => {
+    if (event.ctrlKey) {
+      setIsCtrlPressed.toggle();
+    }
+  };
+  const keyDownRef = useRef(handleCtrlKeyDown);
+
+  useEffect(() => {
+    document.addEventListener("keydown", keyDownRef.current);
+
+    return () => document.removeEventListener("keydown", keyDownRef.current);
+  }, []);
 
   const handleOnKeyDownReminderTextEditInput = (
     e: React.KeyboardEvent<HTMLInputElement>
@@ -89,7 +104,7 @@ export default function SavedPage(props: {
 
   const handleOnClickLink = () => {
     window.open(props.incomingPage.url, "_blank");
-    if (isAutoDelete) {
+    if (isAutoDelete || isCtrlPressed) {
       props.deletePage();
     }
   };
@@ -165,13 +180,16 @@ export default function SavedPage(props: {
               <HStack spacing={0}>
                 <Box
                   flexGrow={1}
+                  maxW="70%"
                   borderRadius="sm"
                   padding={1}
                   textAlign="start"
                   textColor="black.alpha.50"
                   onClick={handleOnClickLink}
                 >
-                  <Link isTruncated>{props.incomingPage.reminderText}</Link>
+                  <Link>
+                    <Text isTruncated>{props.incomingPage.reminderText}</Text>
+                  </Link>
                 </Box>
                 <Divider
                   h="1em"
