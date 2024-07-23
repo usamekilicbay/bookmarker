@@ -154,7 +154,6 @@ export default function App() {
   function importPages(file: File): void {
     const reader = new FileReader();
     reader.readAsText(file);
-
     reader.onload = (e) => {
       try {
         const tempPages: ISavedPage[] = JSON.parse(
@@ -162,6 +161,12 @@ export default function App() {
         ) as ISavedPage[];
         if (tempPages) {
           setPages(tempPages);
+          toast({
+            title: "Data imported successfully",
+            status: "success",
+            duration: 2000,
+            isClosable: true,
+          });
         }
       } catch (error) {
         toast({
@@ -218,7 +223,7 @@ export default function App() {
               spacing={2}
               py={1}
               px={6}
-              h="280px"
+              h="360px"
               overflowY="auto" // Use overflowY="auto" for smooth scrolling
               sx={{
                 "&:hover": {
