@@ -30,14 +30,7 @@
       "matches": ["<all_urls>"]
     }
   ],
-  "permissions": [
-    "scripting",
-    "activeTab",
-    "tabs",
-    "webNavigation",
-    "webRequest",
-    "storage"
-  ],
+  "permissions": ["tabs"],
   "host_permissions": ["http://*/*", "https://*/*"],
   "commands": {
     "Reload_Extension": {
@@ -45,14 +38,7 @@
         "default": "Ctrl+M",
         "mac": "Command+M"
       },
-      "description": "Reload extension in case of a bug, implemented for development purposes."
-    },
-    "Summon_Save_Input": {
-      "suggested_key": {
-        "default": "Ctrl+B",
-        "mac": "Command+B"
-      },
-      "description": "Open the input field to save current page with a reminder text."
+      "description": "Reload extension in case of a bug."
     }
   }
 }
