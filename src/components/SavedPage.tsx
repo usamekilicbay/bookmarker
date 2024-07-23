@@ -123,14 +123,13 @@ export default function SavedPage(props: {
     <>
       <ListItem>
         <Box
+          bg="dark.item_bg"
           borderRadius="sm"
-          bg="orange.50"
-          outline="solid 1px"
-          outlineColor="orange.500"
+          outline="dashed 1px"
+          outlineColor="dark.outline"
           my={isDetailsExpanded ? "10px" : undefined}
           _hover={{
             transform: "scale(1.1)",
-            bg: "orange.100",
           }}
           transition="transform 0.2s ease-in-out"
         >
@@ -152,7 +151,7 @@ export default function SavedPage(props: {
               <Divider
                 h="2em"
                 orientation="vertical"
-                borderColor="orange.500"
+                borderColor="dark.outline"
               />
               <VStack spacing={0.3}>
                 <Tooltip label="Save" hasArrow>
@@ -184,7 +183,6 @@ export default function SavedPage(props: {
                   borderRadius="sm"
                   padding={1}
                   textAlign="start"
-                  textColor="black.alpha.50"
                   onClick={handleOnClickLink}
                 >
                   <Link>
@@ -194,7 +192,7 @@ export default function SavedPage(props: {
                 <Divider
                   h="1em"
                   orientation="vertical"
-                  borderColor="orange.500"
+                  borderColor="dark.outline"
                 />
                 <Box ms={1}>
                   <Tooltip label="Details" hasArrow>
@@ -202,6 +200,7 @@ export default function SavedPage(props: {
                       aria-label="Show details"
                       variant="ghost"
                       size="sm"
+                      color="dark.text.primary"
                       onClick={setIsDetailsExpanded.toggle}
                       icon={
                         isDetailsExpanded ? (
@@ -217,6 +216,7 @@ export default function SavedPage(props: {
                       aria-label="Edit saved page"
                       variant="ghost"
                       size="sm"
+                      color="dark.text.primary"
                       icon={<HiOutlinePencilAlt></HiOutlinePencilAlt>}
                       onClick={() => setIsEditing(true)}
                     />
@@ -241,14 +241,18 @@ export default function SavedPage(props: {
                 <Divider
                   w="80%"
                   mx="auto"
-                  borderColor="orange.500"
-                  mb={2}
+                  borderColor="dark.outline"
+                  mb={3}
                 ></Divider>
                 <Text align="start" fontSize="x-small">
                   {formattedDate}
                 </Text>
-                <Text fontSize="small">{props.incomingPage.title}</Text>
-                <Text align="start">{props.incomingPage.reminderText}</Text>
+                <Text fontWeight="bold" my={1}>
+                  {props.incomingPage.title}
+                </Text>
+                <Text textAlign="start" align="start" fontSize="large">
+                  {props.incomingPage.reminderText}
+                </Text>
               </Box>
             </>
           )}
