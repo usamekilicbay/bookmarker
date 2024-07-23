@@ -16,7 +16,7 @@ import {
   HiOutlineTrash,
   HiOutlineSparkles,
 } from "react-icons/hi";
-import { HiMagnifyingGlass, HiOutlineArrowPath } from "react-icons/hi2";
+import { HiOutlineArrowPath } from "react-icons/hi2";
 import { ISavedPage as ISavedPage } from "../models/saved-page";
 import saveAs from "file-saver";
 import { PAGE_SAVE_STORAGE_KEY } from "../common/constants";
@@ -68,17 +68,11 @@ export default function Settings(props: {
   };
 
   const handleImportData = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(event.target);
     const target = event.target as HTMLInputElement & { files: FileList };
     const file = target.files[0];
     if (file && file.type === "application/json") {
       props.importPages(file);
-      toast({
-        title: "Data imported successfully",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
-
       return;
     }
     toast({
@@ -102,18 +96,22 @@ export default function Settings(props: {
             <IconButton
               aria-label="Settings"
               icon={<HiOutlineCog></HiOutlineCog>}
+              fontSize="x-large"
               variant="ghost"
-              textColor="orange.500"
+              textColor="dark.primary"
+              colorScheme="whiteAlpha"
               _hover={{
-                textColor: "purple.500",
+                textColor: "dark.secondary",
                 transform: "rotate(90Deg)",
                 transition: "transform 0.3s ease-in-out",
               }}
             />
           </PopoverTrigger>
           <PopoverContent
-            bg="orange.50"
-            borderColor="orange.500"
+            bg="dark.tertiary"
+            borderColor="dark.primary"
+            borderStyle="dotted"
+            borderWidth={2}
             w="50px"
             rounded="md"
             p={1}
@@ -122,7 +120,7 @@ export default function Settings(props: {
               <VStack>
                 <Tooltip
                   label={`Auto delete (${
-                    isAutoDeleteChecked ? "active" : "disabled"
+                    isAutoDeleteChecked ? "enabled" : "disabled"
                   }) saved page after opening`}
                   placement="left"
                   hasArrow
@@ -142,16 +140,9 @@ export default function Settings(props: {
                   <IconButton
                     aria-label="Reload saved pages"
                     variant="ghost"
+                    textColor="dark.text.icon_button"
                     onClick={handleOnLoadSavedPages}
                     icon={<HiOutlineArrowPath></HiOutlineArrowPath>}
-                  ></IconButton>
-                </Tooltip>
-                <Tooltip label="Get saved page" placement="left" hasArrow>
-                  <IconButton
-                    aria-label={"Get saved page"}
-                    variant="ghost"
-                    onClick={() => props.getSavedPage(crypto.randomUUID())}
-                    icon={<HiMagnifyingGlass></HiMagnifyingGlass>}
                   ></IconButton>
                 </Tooltip>
                 <Tooltip
@@ -162,6 +153,7 @@ export default function Settings(props: {
                   <IconButton
                     aria-label={"Export saved pages as JSON"}
                     variant="ghost"
+                    textColor="dark.text.icon_button"
                     onClick={handleExportData}
                     icon={<HiOutlineDownload></HiOutlineDownload>}
                   ></IconButton>
@@ -179,6 +171,7 @@ export default function Settings(props: {
                       as="span"
                       aria-label={"Import pages as JSON"}
                       variant="ghost"
+                      textColor="dark.text.icon_button"
                       icon={<HiOutlineUpload></HiOutlineUpload>}
                     ></IconButton>
                   </label>
@@ -191,7 +184,7 @@ export default function Settings(props: {
                   <IconButton
                     aria-label={"Delete all saved pages"}
                     variant="ghost"
-                    textColor="orangered"
+                    textColor="dark.danger"
                     onClick={props.deleteAllSavedPages}
                     icon={<HiOutlineTrash></HiOutlineTrash>}
                   ></IconButton>
