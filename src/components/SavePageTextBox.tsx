@@ -79,8 +79,8 @@ export default function SavePageTextBox(props: {
               isInvalid={isValid}
               variant="flushed"
               placeholder="Enter something to remember"
-              focusBorderColor="purple.500"
-              errorBorderColor="crimson"
+              focusBorderColor="dark.focused"
+              errorBorderColor="dark.error"
               onChange={onChange}
               onKeyDown={handleOnKeyDownReminderTextSaveInput}
               boxShadow="lg"
@@ -94,7 +94,9 @@ export default function SavePageTextBox(props: {
             variant="ghost"
             icon={<HiPlus></HiPlus>}
             fontSize="x-large"
-            textColor={isValid || props.isActive ? "purple.500" : "orangered"}
+            textColor={
+              isValid || props.isActive ? "dark.enabled" : "dark.disabled"
+            }
             onClick={onClickSave}
             transform={
               isValid || props.isActive ? "rotate(0Deg)" : "rotate(-45Deg)"

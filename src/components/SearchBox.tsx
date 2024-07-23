@@ -25,7 +25,7 @@ export function SearchBox(props: {
             variant="ghost"
             icon={<HiSearch></HiSearch>}
             fontSize="large"
-            textColor={props.isActive ? "purple.500" : "orangered"}
+            textColor={props.isActive ? "dark.enabled" : "dark.disabled"}
             transform={props.isActive ? "rotate(0Deg)" : "rotate(90Deg)"}
             _active={{
               backgroundColor: "inherit",
@@ -40,8 +40,8 @@ export function SearchBox(props: {
               id="search_input"
               variant="flushed"
               placeholder="Enter something to search"
-              focusBorderColor="purple.500"
-              errorBorderColor="crimson"
+              focusBorderColor="dark.focused"
+              errorBorderColor="dark.error"
               onChange={onChange}
               boxShadow="lg"
               paddingX={2}
