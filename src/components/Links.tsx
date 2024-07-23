@@ -17,7 +17,7 @@ export default function Links() {
           <LiaLinkedin className="size-6"></LiaLinkedin>
         </Link>
         <Link
-          href="https://www.linkedin.com/in/usame-kilicbay/"
+          href="https://github.com/usamekilicbay"
           isExternal
           _hover={{
             textColor: "purple.500",
