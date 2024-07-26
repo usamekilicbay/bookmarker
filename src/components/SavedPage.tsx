@@ -49,19 +49,30 @@ export default function SavedPage(props: {
     minute: "2-digit",
   });
 
-  const [isCtrlPressed, setIsCtrlPressed] = useBoolean(false);
+  const [isCtrlPressed, setIsCtrlPressed] = useState<boolean>(false);
 
   const handleCtrlKeyDown = (event: KeyboardEvent) => {
-    if (event.ctrlKey) {
-      setIsCtrlPressed.toggle();
+    if (event.key === "Control") {
+      setIsCtrlPressed(true);
     }
   };
   const keyDownRef = useRef(handleCtrlKeyDown);
 
+  const handleCtrlKeyUp = (event: KeyboardEvent) => {
+    if (event.key === "Control") {
+      setIsCtrlPressed(false);
+    }
+  };
+  const keyUpRef = useRef(handleCtrlKeyUp);
+
   useEffect(() => {
     document.addEventListener("keydown", keyDownRef.current);
+    document.addEventListener("keyup", keyUpRef.current);
 
-    return () => document.removeEventListener("keydown", keyDownRef.current);
+    return () => {
+      document.removeEventListener("keydown", keyDownRef.current);
+      document.removeEventListener("keyup", keyUpRef.current);
+    };
   }, []);
 
   const handleOnKeyDownReminderTextEditInput = (
