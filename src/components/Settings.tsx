@@ -68,11 +68,11 @@ export default function Settings(props: {
   };
 
   const handleImportData = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target);
     const target = event.target as HTMLInputElement & { files: FileList };
     const file = target.files[0];
     if (file && file.type === "application/json") {
       props.importPages(file);
+      event.target.value = "";
       return;
     }
     toast({
@@ -162,8 +162,9 @@ export default function Settings(props: {
                   <label>
                     <input
                       id="saved-pages-import-input"
-                      type="file"
                       aria-label={"Input for importing saved pages as JSON"}
+                      type="file"
+                      accept=".json"
                       onChange={handleImportData}
                       style={{ display: "none" }}
                     ></input>
