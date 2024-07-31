@@ -32,7 +32,6 @@ export default function Settings(props: {
   deleteAllSavedPages: () => void;
   loadSavedPages: (storageKey: string) => void;
   importPages: (file: File) => void;
-  getSavedPage: (id: string) => ISavedPage | undefined;
   seedDummyPages: () => void;
   removeDummyPages: () => void;
   savedPages: ISavedPage[];

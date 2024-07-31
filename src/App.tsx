@@ -36,11 +36,7 @@ export default function App() {
     setShownPages(pages);
 
     if (pages.length > 0) return;
-
-    const tempPages = loadSavedPages(PAGE_SAVE_STORAGE_KEY);
-    if (tempPages && tempPages.length > 0) {
-      setPages(tempPages);
-    }
+    loadSavedPageRecords(PAGE_SAVE_STORAGE_KEY);
   }, [pages]);
 
   useEffect(() => {
@@ -80,56 +76,18 @@ export default function App() {
     }
   }
 
-  function loadSavedPages(storageKey: string): ISavedPage[] | undefined {
-    const value = window.localStorage.getItem(storageKey);
-    if (value) {
-      try {
-        const tempPages: ISavedPage[] = JSON.parse(value) as ISavedPage[];
-        if (tempPages && tempPages.length > 0) {
-          tempPages.forEach((x: ISavedPage) => {
-            if (x && x.id.length > 0) {
-              return tempPages;
-            }
-            toast({
-              title: "Format error!",
-              description: "At least one record has broken format",
-              status: "error",
-              duration: 2000,
-              isClosable: true,
-            });
-          });
-        }
-        toast({
-          title: "No record has been saved",
-          status: "info",
-          duration: 2000,
-          isClosable: true,
-        });
-        return;
-      } catch (error) {
-        toast({
-          title: "Format error!",
-          description: "Records could not be retrieved",
-          status: "error",
-          duration: 2000,
-          isClosable: true,
-        });
-      }
+  function setSavedPageRecords(pages: ISavedPage[] | undefined): void {
+    if (pages && pages.length > 0) {
+      setPages(pages);
     }
   }
 
-  function getSavedPage(id: string): ISavedPage | undefined {
-    const pages = loadSavedPages(PAGE_SAVE_STORAGE_KEY);
-    if (pages) {
-      return pages.find((page) => page.id === id);
+  function loadSavedPageRecords(storageKey: string): void {
+    const jsonString = window.localStorage.getItem(storageKey);
+    if (jsonString) {
+      const pages = getSavedPagesFromJson(jsonString);
+      setSavedPageRecords(pages);
     }
-    toast({
-      title: "Page could not be retrieved",
-      description: "There is no page with the specified id!",
-      status: "error",
-      duration: 2000,
-      isClosable: true,
-    });
   }
 
   function updatePage(pageId: string, reminderText: string) {
@@ -145,7 +103,6 @@ export default function App() {
     let tempPages: ISavedPage[] = [...pages];
     tempPages = tempPages.filter((p) => p.id !== id);
     setPages(tempPages);
-
     toast({
       title: "Page deleted successfully",
       status: "success",
@@ -157,7 +114,6 @@ export default function App() {
   const deleteAllSavedPages = () => {
     setIsDelete(true);
     setPages([]);
-
     toast({
       title: "All pages are deleted successfully",
       status: "success",
@@ -170,41 +126,39 @@ export default function App() {
     const reader = new FileReader();
     reader.readAsText(file);
     reader.onload = (e) => {
-      try {
-        const tempPages: ISavedPage[] = JSON.parse(
-          e.target?.result as string
-        ) as ISavedPage[];
-        if (tempPages && tempPages.length > 0) {
-          const hasFormatError = tempPages.some(
-            (x: ISavedPage) =>
-              !x ||
-              !x.id ||
-              !x.reminderText ||
-              !x.url ||
-              !x.saveDate ||
-              !x.title
-          );
-          if (hasFormatError) {
-            throw new Error("Format error!");
-          }
-          setPages(tempPages);
-          toast({
-            title: "Data imported successfully",
-            status: "success",
-            duration: 2000,
-            isClosable: true,
-          });
-        }
-      } catch (error) {
-        toast({
-          title: "Import failed",
-          description: "At least one record has broken format",
-          status: "error",
-          duration: 2000,
-          isClosable: true,
-        });
-      }
+      const jsonString = e.target?.result as string;
+      const tempPages = getSavedPagesFromJson(jsonString);
+      setSavedPageRecords(tempPages);
     };
+  }
+
+  function getSavedPagesFromJson(jsonString: string): ISavedPage[] | undefined {
+    const tempPages: ISavedPage[] = JSON.parse(jsonString) as ISavedPage[];
+    if (tempPages && tempPages.length > 0) {
+      return isSavedPagesFormatCorrect(tempPages) ? tempPages : undefined;
+    }
+  }
+
+  function isSavedPagesFormatCorrect(pages: ISavedPage[]): boolean {
+    try {
+      const hasFormatError = pages.some(
+        (x: ISavedPage) =>
+          !x || !x.id || !x.reminderText || !x.url || !x.saveDate || !x.title
+      );
+      if (hasFormatError) {
+        throw new Error("Format error!");
+      }
+      return true;
+    } catch (error) {
+      toast({
+        title: "Import failed",
+        description: "At least one record has broken format",
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+      return false;
+    }
   }
 
   function searchPages(searchText: string | undefined): void {
@@ -237,9 +191,8 @@ export default function App() {
             <Settings
               setSettings={setSettings}
               deleteAllSavedPages={deleteAllSavedPages}
-              loadSavedPages={() => loadSavedPages(PAGE_SAVE_STORAGE_KEY)}
+              loadSavedPages={() => loadSavedPageRecords(PAGE_SAVE_STORAGE_KEY)}
               importPages={importPages}
-              getSavedPage={() => getSavedPage(crypto.randomUUID())}
               savedPages={pages}
               seedDummyPages={() => SeedDummyPages(pages)}
               removeDummyPages={RemoveDummyPages}
