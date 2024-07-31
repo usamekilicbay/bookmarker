@@ -95,16 +95,15 @@ export default function Settings(props: {
           <PopoverTrigger>
             <IconButton
               aria-label="Settings"
-              icon={<HiOutlineCog></HiOutlineCog>}
-              fontSize="x-large"
               variant="ghost"
+              fontSize="x-large"
               textColor="dark.primary"
-              colorScheme="whiteAlpha"
               _hover={{
                 textColor: "dark.secondary",
                 transform: "rotate(90Deg)",
                 transition: "transform 0.3s ease-in-out",
               }}
+              icon={<HiOutlineCog></HiOutlineCog>}
             />
           </PopoverTrigger>
           <PopoverContent
@@ -141,8 +140,8 @@ export default function Settings(props: {
                     aria-label="Reload saved pages"
                     variant="ghost"
                     textColor="dark.text.icon_button"
-                    onClick={handleOnLoadSavedPages}
                     icon={<HiOutlineArrowPath></HiOutlineArrowPath>}
+                    onClick={handleOnLoadSavedPages}
                   ></IconButton>
                 </Tooltip>
                 <Tooltip
@@ -154,8 +153,8 @@ export default function Settings(props: {
                     aria-label={"Export saved pages as JSON"}
                     variant="ghost"
                     textColor="dark.text.icon_button"
-                    onClick={handleExportData}
                     icon={<HiOutlineDownload></HiOutlineDownload>}
+                    onClick={handleExportData}
                   ></IconButton>
                 </Tooltip>
                 <Tooltip label="Import pages as JSON" placement="left" hasArrow>
@@ -186,8 +185,12 @@ export default function Settings(props: {
                     aria-label={"Delete all saved pages"}
                     variant="ghost"
                     textColor="dark.danger"
-                    onClick={props.deleteAllSavedPages}
+                    _hover={{
+                      textColor: "dark.text.primary",
+                      backgroundColor: "dark.danger",
+                    }}
                     icon={<HiOutlineTrash></HiOutlineTrash>}
+                    onClick={props.deleteAllSavedPages}
                   ></IconButton>
                 </Tooltip>
                 {IS_DEV_MODE_ACTIVE && (
@@ -201,8 +204,8 @@ export default function Settings(props: {
                         aria-label={"Generate dummy pages"}
                         variant="ghost"
                         textColor="purple"
-                        onClick={props.seedDummyPages}
                         icon={<HiOutlineSparkles></HiOutlineSparkles>}
+                        onClick={props.seedDummyPages}
                       ></IconButton>
                     </Tooltip>
                     <Tooltip
@@ -214,8 +217,8 @@ export default function Settings(props: {
                         aria-label={"Remove dummy pages"}
                         variant="ghost"
                         textColor="purple"
-                        onClick={props.removeDummyPages}
                         icon={<HiOutlineTrash></HiOutlineTrash>}
+                        onClick={props.removeDummyPages}
                       ></IconButton>
                     </Tooltip>
                   </>

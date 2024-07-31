@@ -170,6 +170,7 @@ export default function SavedPage(props: {
                     aria-label="Save changes"
                     variant="ghost"
                     size="sm"
+                    color="dark.text.icon_button"
                     icon={<HiOutlineCheck></HiOutlineCheck>}
                     onClick={handleOnFinishEditingReminderText}
                   />
@@ -179,6 +180,11 @@ export default function SavedPage(props: {
                     aria-label="Cancel changes"
                     variant="ghost"
                     size="sm"
+                    textColor="dark.danger"
+                    _hover={{
+                      textColor: "dark.text.primary",
+                      backgroundColor: "dark.danger",
+                    }}
                     icon={<HiOutlineX></HiOutlineX>}
                     onClick={handleOnCancelEditingReminderText}
                   />
@@ -211,8 +217,7 @@ export default function SavedPage(props: {
                       aria-label="Show details"
                       variant="ghost"
                       size="sm"
-                      color="dark.text.primary"
-                      onClick={setIsDetailsExpanded.toggle}
+                      color="dark.text.icon_button"
                       icon={
                         isDetailsExpanded ? (
                           <HiChevronUp></HiChevronUp>
@@ -220,6 +225,7 @@ export default function SavedPage(props: {
                           <HiChevronDown></HiChevronDown>
                         )
                       }
+                      onClick={setIsDetailsExpanded.toggle}
                     />
                   </Tooltip>
                   <Tooltip label="Edit" hasArrow>
@@ -227,7 +233,7 @@ export default function SavedPage(props: {
                       aria-label="Edit saved page"
                       variant="ghost"
                       size="sm"
-                      color="dark.text.primary"
+                      color="dark.text.icon_button"
                       icon={<HiOutlinePencilAlt></HiOutlinePencilAlt>}
                       onClick={() => setIsEditing(true)}
                     />
@@ -237,7 +243,11 @@ export default function SavedPage(props: {
                       aria-label="Delete saved page"
                       variant="ghost"
                       size="sm"
-                      textColor="orangered"
+                      textColor="dark.danger"
+                      _hover={{
+                        textColor: "dark.text.primary",
+                        backgroundColor: "dark.danger",
+                      }}
                       icon={<HiOutlineTrash></HiOutlineTrash>}
                       onClick={props.deletePage}
                     />
