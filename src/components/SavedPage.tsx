@@ -196,7 +196,7 @@ export default function SavedPage(props: {
           ) : (
             <>
               <Grid templateColumns="66% 1% 33%">
-                <GridItem>
+                <GridItem alignContent="center">
                   <Box
                     borderRadius="sm"
                     padding={1}
@@ -215,7 +215,7 @@ export default function SavedPage(props: {
                     borderColor="dark.outline"
                   />
                 </GridItem>
-                <GridItem>
+                <GridItem alignContent="center">
                   <Tooltip label="Details" hasArrow>
                     <IconButton
                       aria-label="Show details"
