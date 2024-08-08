@@ -13,6 +13,8 @@ import {
   Editable,
   EditableInput,
   EditablePreview,
+  Grid,
+  GridItem,
   HStack,
   IconButton,
   Link,
@@ -193,25 +195,27 @@ export default function SavedPage(props: {
             </HStack>
           ) : (
             <>
-              <HStack spacing={0}>
-                <Box
-                  flexGrow={1}
-                  maxW="70%"
-                  borderRadius="sm"
-                  padding={1}
-                  textAlign="start"
-                  onClick={handleOnClickLink}
-                >
-                  <Link>
-                    <Text isTruncated>{props.incomingPage.reminderText}</Text>
-                  </Link>
-                </Box>
-                <Divider
-                  h="1em"
-                  orientation="vertical"
-                  borderColor="dark.outline"
-                />
-                <Box ms={1}>
+              <Grid templateColumns="66% 1% 33%">
+                <GridItem>
+                  <Box
+                    borderRadius="sm"
+                    padding={1}
+                    textAlign="start"
+                    onClick={handleOnClickLink}
+                  >
+                    <Link>
+                      <Text isTruncated>{props.incomingPage.reminderText}</Text>
+                    </Link>
+                  </Box>
+                </GridItem>
+                <GridItem alignContent="center">
+                  <Divider
+                    h="1em"
+                    orientation="vertical"
+                    borderColor="dark.outline"
+                  />
+                </GridItem>
+                <GridItem>
                   <Tooltip label="Details" hasArrow>
                     <IconButton
                       aria-label="Show details"
@@ -252,8 +256,8 @@ export default function SavedPage(props: {
                       onClick={props.deletePage}
                     />
                   </Tooltip>
-                </Box>
-              </HStack>
+                </GridItem>
+              </Grid>
             </>
           )}
           {isDetailsExpanded && (
